@@ -24,7 +24,7 @@ def home_get():
     if current_user.is_authenticated:
         redirect_url = request.args.get('next') or url_for('user.members')
         return redirect(redirect_url)
-    else:      
+    else:
         login_form = LoginForm(request.form)
         register_form = RegisterForm(request.form)
 
@@ -47,15 +47,15 @@ def home_post():
             return redirect(redirect_url)
         elif register_form.validate_on_submit():
             User.create(
-                username=register_form.username.data, 
-                email=register_form.email.data, 
+                username=register_form.username.data,
+                email=register_form.email.data,
                 password=register_form.password.data,
                 active=True
             )
             flash('Thank you for registering. You can now log in.', 'success')
             return redirect(url_for('public.home_get'))
         else:
-            flash_errors(form)
+            flash_errors(login_form)
     return render_template('public/home.html', login_form=login_form, register_form=register_form)
 
 
@@ -77,7 +77,7 @@ def register_post():
         flash('Thank you for registering. You can now log in.', 'success')
         return redirect(url_for('public.home_get'))
     else:
-        flash_errors(form)
+        flash_errors(register_form)
         return redirect(url_for('public.register_get'))
 
 @blueprint.route('/register/', methods=['GET'])
@@ -93,4 +93,3 @@ def about():
     """About page."""
     form = LoginForm(request.form)
     return render_template('public/about.html', form=form)
-
