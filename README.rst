@@ -80,7 +80,10 @@ To apply the migration.
 
 For a full migration command reference, run ``flask db --help``.
 
-Start mysql
------------
+Mysql
+------
+Start: sudo service mysql start
 
-mysql -u root -p
+run: mysql -u root -p
+
+stop: sudo service mysql stop
