@@ -79,3 +79,8 @@ This will generate a new migration script. Then run ::
 To apply the migration.
 
 For a full migration command reference, run ``flask db --help``.
+
+Start mysql
+-----------
+
+mysql -u root -p
