@@ -93,3 +93,10 @@ def about():
     """About page."""
     form = LoginForm(request.form)
     return render_template('public/about.html', form=form)
+
+@blueprint.route('/../users/input/')
+def input():
+    """About page."""
+    form = LoginForm(request.form)
+    redirect_url = url_for('user.input')
+    return redirect(redirect_url)

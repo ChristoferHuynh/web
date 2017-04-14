@@ -10,7 +10,6 @@
 .body-content {
   text-align: center;
   padding-top: 200px;
-
 }
 
 .form {
@@ -39,26 +38,26 @@
   font-family: "Roboto", sans-serif;
   text-transform: uppercase;
   outline: 0;
-  background: #4CAF50;
+  background: linear-gradient(to bottom, #eeeeee 0%, #dddddd 100%);
   width: 100%;
   border: 0;
   padding: 15px;
-  color: #FFFFFF;
+  color: #000000;
   font-size: 14px;
   -webkit-transition: all 0.3 ease;
   transition: all 0.3 ease;
   cursor: pointer;
 }
 .form button:hover,.form button:active,.form button:focus {
-  background: #43A047;
+  background: #c1c1c1;
 }
 .form .message {
   margin: 15px 0 0;
-  color: #b3b3b3;
+  color: #999999;
   font-size: 12px;
 }
 .form .message a {
-  color: #4CAF50;
+  color: #5b5b5b;
   text-decoration: none;
 }
 .form .register-form {

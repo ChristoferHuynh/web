@@ -84,3 +84,9 @@ footer .footer-nav {
   margin-right: 25px;
   list-style: none;
 }
+
+/* About page */
+
+.about-text{
+  width: 500px;
+}
