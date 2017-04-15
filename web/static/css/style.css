@@ -14,6 +14,7 @@ body {
 
 section {
   overflow: auto;
+
 }
 
 textarea {
@@ -50,39 +51,46 @@ textarea {
 /* footer */
 
 footer {
-  margin-top: 45px;
-  padding-top: 5px;
-  border-top: 1px solid #eaeaea;
+  margin-top: 110px;
+  padding-top: 20px;
   color: #999999;
-}
+
+} 
 
 footer a {
   color: #999999;
+
 }
 
 footer p {
   float: right;
   margin-right: 25px;
+
 }
 
 footer ul {
   list-style: none;
+
 }
 
 footer ul li {
   float: left;
   margin-left: 10px;
+
 }
 
 footer .company {
   float: left;
-  margin-left: 25px;
+  margin-left: -30px;
+
+
 }
 
 footer .footer-nav {
   float: right;
   margin-right: 25px;
   list-style: none;
+
 }
 
 /* About page */

@@ -3,8 +3,8 @@
 
 .login-page {
   width: 360px;
-  padding: 8% 0 0;
-  margin: auto;
+  padding: 5% 0 0%;
+  margin-left: 900px;
 }
 
 .body-content {
@@ -62,4 +62,10 @@
 }
 .form .register-form {
   display: none;
+}
+
+body{
+  background-image:  url('../../images/background.png');
+  background-repeat:no-repeat;
+  background-size:cover;
 }
