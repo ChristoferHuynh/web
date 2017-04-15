@@ -17,3 +17,9 @@ def members():
 def input():
     """Input page."""
     return render_template('users/input.html')
+
+@blueprint.route('/results/')
+@login_required
+def results():
+    """Input page."""
+    return render_template('users/results.html')
