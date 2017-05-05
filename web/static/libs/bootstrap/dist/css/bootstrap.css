@@ -895,7 +895,8 @@ html {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
+  font-family: Arial: ;
   font-size: 14px;
   line-height: 1.42857143;
   color: #333;
@@ -4199,6 +4200,10 @@ fieldset[disabled] .navbar-default .btn-link:focus {
 .navbar-inverse {
   background: linear-gradient(to bottom, #eeeeee 0%, #dddddd 100%);
   border-color: #dddddd;
+  /*border-radius: 0px 0px 25px 25px;  
+  margin-top: 10px;
+  margin-right: 180px;
+  margin-left: 180px;*/
 }
 .navbar-inverse .navbar-brand {
   color: white;
@@ -4624,6 +4629,8 @@ a.thumbnail.active {
   border: 1px solid transparent;
   border-radius: 4px;
   margin-top: 20px;
+  position: absolute;
+  left: 500px;
 }
 .alert h4 {
   margin-top: 0;
