@@ -91,6 +91,7 @@ def register_get():
 @blueprint.route('/about/')
 def about():
     """About page."""
+<<<<<<< HEAD
     return render_template('public/about.html')
 
 @blueprint.route('/../users/input/')
@@ -101,3 +102,7 @@ def input():
     return redirect(redirect_url)
 
 
+=======
+    form = LoginForm(request.form)
+    return render_template('public/about.html', form=form)
+>>>>>>> 888cabb2a90c59dc8552fb483aab87fcce137f02

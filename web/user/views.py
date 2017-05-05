@@ -18,6 +18,7 @@ def input():
     """Input page."""
     return render_template('users/input.html')
 
+<<<<<<< HEAD
 
 
 from flask import url_for, redirect, render_template
@@ -38,3 +39,10 @@ def upload():
         return redirect(url_for('user.upload'))
 
     return render_template('users/upload.html', form=form)
+=======
+@blueprint.route('/results/')
+@login_required
+def results():
+    """Input page."""
+    return render_template('users/results.html')
+>>>>>>> 888cabb2a90c59dc8552fb483aab87fcce137f02
