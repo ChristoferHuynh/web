@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
 """User views."""
+from flask import Flask
 from flask import Blueprint, render_template
 from flask_login import login_required
+from flask import url_for, redirect, render_template
+from flask_wtf import Form
+from flask_wtf.file import FileField
+from werkzeug import secure_filename
+from flask import send_from_directory
+import os
+from flask import Flask, request, abort
+from web.extensions import storage
 
 blueprint = Blueprint('user', __name__, url_prefix='/users', static_folder='../static')
-
 
 @blueprint.route('/members/')
 @login_required
@@ -12,37 +20,33 @@ def members():
     """List members."""
     return render_template('users/members.html')
 
-@blueprint.route('/input/')
+
+@blueprint.route("/upload/", methods=["GET"])
 @login_required
-def input():
-    """Input page."""
-    return render_template('users/input.html')
+def upload_get():
+    print storage
+#    import pdb
+#    pdb.set_trace()
+    return render_template('users/upload.html', storage=storage)
 
-<<<<<<< HEAD
+
+@blueprint.route("/upload/", methods=["POST"])
+@login_required
+def upload_post():
+    file = request.files.get("file")
+    my_upload = storage.upload(file)
+    return render_template('users/upload.html', storage=storage)
 
 
-from flask import url_for, redirect, render_template
-from flask_wtf import Form
-from flask_wtf.file import FileField
-from werkzeug import secure_filename
 
-class UploadForm(Form):
-    file = FileField(render_kw={'multiple': True})
-
-@blueprint.route('/upload/', methods=['GET', 'POST'])
-def upload():
-    form = UploadForm()
-
-    if form.validate_on_submit():
-        filename = secure_filename(form.file.data.filename)
-        form.file.data.save('uploads/' + filename)
-        return redirect(url_for('user.upload'))
-
-    return render_template('users/upload.html', form=form)
-=======
 @blueprint.route('/results/')
 @login_required
 def results():
-    """Input page."""
-    return render_template('users/results.html')
->>>>>>> 888cabb2a90c59dc8552fb483aab87fcce137f02
+    """Result page."""
+    return render_template('users/results.html', storage=storage)
+
+@blueprint.route("/view/<path:object_name>")
+@login_required
+def view_get(object_name):
+    obj = storage.get(object_name)
+    return render_template("users/view.html", obj=obj)

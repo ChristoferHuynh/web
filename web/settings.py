@@ -6,7 +6,7 @@ import os
 class Config(object):
     """Base configuration."""
 
-    SECRET_KEY = os.environ.get('web_SECRET', 'secret-key')  # TODO: Change me
+    SECRET_KEY = os.environ.get('WEB_SECRET', 'secret-key')  # TODO: Change me
     APP_DIR = os.path.abspath(os.path.dirname(__file__))  # This directory
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
     BCRYPT_LOG_ROUNDS = 13
@@ -15,6 +15,12 @@ class Config(object):
     DEBUG_TB_INTERCEPT_REDIRECTS = False
     CACHE_TYPE = 'simple'  # Can be "memcached", "redis", etc.
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # FOR LOCAL
+    STORAGE_PROVIDER = "LOCAL"
+    STORAGE_CONTAINER = "uploads"
+    STORAGE_SERVER = True
+    STORAGE_SERVER_URL = "/files"
+
 
 
 class ProdConfig(Config):
