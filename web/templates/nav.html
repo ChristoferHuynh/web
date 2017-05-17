@@ -21,7 +21,7 @@
 
     {% if current_user and current_user.is_authenticated %}
         <ul class="nav navbar-nav">
-        <li><a href="{{ url_for('user.input') }}">Input</a></li>
+        <li><a href="{{ url_for('user.upload_get') }}">Upload</a></li>
         <li><a href="{{ url_for('user.results') }}">Results</a></li>
     </ul>
 

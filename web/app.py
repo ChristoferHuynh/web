@@ -4,7 +4,7 @@ from flask import Flask, render_template
 
 from web import commands, public, user
 from web.assets import assets
-from web.extensions import bcrypt, cache, csrf_protect, db, debug_toolbar, login_manager, migrate
+from web.extensions import bcrypt, cache, csrf_protect, db, debug_toolbar, login_manager, migrate, storage
 from web.settings import ProdConfig
 
 
@@ -20,11 +20,16 @@ def create_app(config_object=ProdConfig):
     register_errorhandlers(app)
     register_shellcontext(app)
     register_commands(app)
+
+    app.config.update({
+    "STORAGE_CONTAINER": "uploads",
+    })
     return app
 
 
 def register_extensions(app):
     """Register Flask extensions."""
+    storage.init_app(app)
     assets.init_app(app)
     bcrypt.init_app(app)
     cache.init_app(app)

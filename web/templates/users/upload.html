@@ -1,0 +1,40 @@
+
+{% extends "layout.html" %}
+{% block content %}
+    <h1 class="h1-upload">Upload log files</h1>
+
+
+<form action="{{ url_for('user.upload_get') }}" method="post" enctype="multipart/form-data">
+         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+    Select image to upload:
+    <input type="file" name="file" id="fileToUpload"> <br>
+    <input type="submit" value="Upload File" name="submit">
+</form>
+
+<hr>
+
+<h3>List of files available on the storage:</h3>
+
+<table>
+    <thead>
+        <th>Name</th>
+        <th>Size</th>
+    </thead>
+    <tbody>
+        {% for obj in storage %}
+        {% set download_url = obj.download_url() %}
+        <tr>
+            <td><a href="{{ download_url }}">{{ obj.name }}</a></td>
+            <td>{{ obj.size }} bytes</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+
+{% endblock %}
+
+{% block css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='public/css/users.css') }}">
+{% endblock %}
