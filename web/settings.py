@@ -20,6 +20,7 @@ class Config(object):
     STORAGE_CONTAINER = "uploads"
     STORAGE_SERVER = True
     STORAGE_SERVER_URL = "/files"
+    STORAGE_ALLOWED_EXTENSIONS = ["log", "txt", "gz", "bz2", "zip", "tar", "tgz", "txz", "7z"]
 
 
 
