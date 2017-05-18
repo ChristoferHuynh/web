@@ -1,0 +1,50 @@
+'important_configs':
+  'really-important.conf':
+    severity: RED
+    message: really-important.conf is missing. It is very important.
+  'alsa-base.conf': 
+    severity: YELLOW
+    message: alsa-base.conf is missing, it is considered important
+  'default':  
+    config:  
+      - important_config.conf
+      - blacklist-ath_pci.conf
+      - blacklist.conf
+      - blacklist-firewire.conf
+      - blacklist-framebuffer.conf
+      - blacklist-modem.conf
+      - blacklist-oss.conf
+    severity: YELLOW
+    message: /conf/ is missing.
+
+  
+'blacklisted_configs':
+  'default': 
+    config: 
+      - blacklist-rare-network.conf
+      - intel-microcode-blacklist.conf
+      - iwlwifi.conf
+      - mlx4.conf
+      - vmwgfx-fbdev.conf
+    severity: YELLOW
+    message: /conf/ is blacklisted! Consider removing!
+  
+
+'important_modules':
+  'v-i-module':
+    severity: YELLOW
+    message: The module 'v-i-module' is missing, and it is very important.
+  'default': 
+    'module': 
+      - inet_diag
+      - important_module
+    severity: YELLOW
+    message: /module/ is missing, it is considered important
+
+'blacklisted_modules':
+  'default': 
+    'module':
+      - joydev
+      - videobuf2_vmalloc
+    severity: YELLOW
+    message: /module/ is blacklisted! Consider removing!

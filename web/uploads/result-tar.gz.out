@@ -1,0 +1,163 @@
+here issues:
+
+### lastlog ###
+
+
+##################
+
+
+
+
+### users ###
+
+
+##################
+
+
+
+
+### diskvolume ###
+
+/dev in /dev 4Head Kapp
+
+##################
+
+
+
+
+### firewall ###
+
+No firewall set up for forwarded traffic
+No firewall set up for incoming traffic
+No firewall set up for output traffic
+
+##################
+
+
+
+
+### open_connections ###
+
+
+##################
+
+
+
+
+### startup ###
+
+The startup script expected-service should be started along the computer
+The startup script bluetooth should not be started along the system
+The startup script avahi-daemon should not be started along the system
+
+##################
+
+
+
+
+### sshd ###
+
+LoginGraceTime is greater than 120
+The default port is set to 22, which the most attackers will check when they are trying to brute force login to the server using several username and password combina-tions. You should consider using another port to login to the server to reduce noise.
+
+##################
+
+
+
+
+### crontab ###
+
+root should probably not run cronjobs.
+User e_user is expected to run cronjobs.
+
+##################
+
+
+
+
+### sudoers ###
+
+env_reset is available. The system will make sure the terminal environment remove any user variables and clear potentially harmful environmental variables from the sudo sessions 
+ 
+
+##################
+
+
+
+
+### groups ###
+
+
+##################
+
+
+
+
+### processes ###
+
+[imp-process] is missing.
+[imp-process/2] is missing.
+[migration/impotest] is missing, it's important.
+[watchdogd] is blacklisted! Consider removing!
+[kdevtmpfs] is blacklisted! Consider removing!
+
+##################
+
+
+
+
+### cron_at ###
+
+No /etc/cron.allow set up.
+No /etc/at.allow set up.
+
+##################
+
+
+
+
+### system ###
+
+
+##################
+
+
+
+
+### environment ###
+
+/bin/bash error
+root user!
+
+##################
+
+
+
+
+### networkvolume ###
+
+No backup found!
+No backup found!
+
+##################
+
+
+
+
+### passwdpolicy ###
+
+The max number of days before having to change a password is more than 90 days. It is recommended to have it at 90.
+
+##################
+
+
+
+
+### suid_files ###
+
+
+##################
+
+
+
+

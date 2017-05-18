@@ -1,0 +1,32 @@
+ENCRYPT_METHOD:
+  'neq': 
+    values: 
+      'MD5': 
+        severity: RED
+        msg: Your currently password encrypting method is MD5. You should consider changing the encrypting method to SHA256 or SHA516.
+        
+#  'eq':  #should maybe use eq instead to make sure they use correct encryption
+#    'SHA516':
+#      severity: RED
+#      msg: Your password encryption method should be SHA516.
+
+
+PASS_MIN_DAYS:
+  'ngr':
+    value: 0
+    severity: YELLOW
+    msg: You have to wait a one or more days before you can change password, this can be a security risk in case of accidental password change.
+
+    
+PASS_MAX_DAYS:
+  'ngr':
+    value: 90
+    severity: YELLOW
+    msg: The max number of days before having to change a password is more than 90 days. It is recommended to have it at 90.
+    
+PASS_WARN_AGE:
+  'nlt':
+    value: 7
+    severity: YELLOW
+    msg: A warning to change the password before it becomes invalid is issued less than 7 days before. It is recommended to give the user at least 7 days.
+      

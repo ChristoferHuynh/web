@@ -1,0 +1,54 @@
+SHELL:
+  neq:
+    values:
+      '/bin/bash': 
+        severity: YELLOW
+        msg: /bin/bash error
+      
+      '/bin/bad':
+        severity: RED
+        msg: /bin/bad error
+        
+
+SHLVL:
+  neq:
+    values:
+      '8':  
+        severity: RED
+        msg: The shell lvl is 8
+  
+  nbtwn:
+    values: 
+      'SHELL LEVEL BETWEEN 1-5': 
+        ranges: 
+          - [1, 5]
+        severity: RED
+        
+      'SHELL LEVEL BETWEEN 10-15, 20-25':
+        ranges:
+          - [10, 15]
+          - [20, 25]
+        severity: YELLOW
+        
+
+
+USER:
+  neq:
+    values:
+      'root':
+        severity: RED
+        msg: root user!
+      
+      'admin':
+        severity: RED
+        msg: admin user!
+        
+
+key: 
+  neq:
+    values:
+      'value1':
+        severity: YELLOW
+        msg: key = value1
+        
+        

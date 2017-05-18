@@ -1,0 +1,19 @@
+'expected':
+  'scripts': 
+    - bluetooth
+    - avahi-daemon
+    - expected-service
+  msg: The startup script /script/ should be started along the computer
+  severity: RED
+  
+'blacklisted':
+  'scripts':
+    - bluetooth
+    - avahi-daemon
+    - expected-service
+  msg: The startup script /script/ should not be started along the system
+  severity: RED
+  
+'permission': 
+  msg: Someone other than root can write to the startup script /script/. This can allow attackers to take over the computer.
+  severity: RED

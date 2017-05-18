@@ -1,0 +1,31 @@
+INPUT: 
+  policy: 
+    neq:
+      values: 
+        'ACCEPT':
+          severity: RED
+          msg: No firewall set up for incoming traffic
+        
+  source:
+    neq:
+      values: 
+        '5.5.5.5':
+          severity: RED
+          msg: Firewall does not protect from ip 5.5.5.5 which is known to be dangerous
+
+FORWARD: 
+  policy: 
+    neq:
+      values: 
+        'ACCEPT':
+          severity: RED
+          msg: No firewall set up for forwarded traffic
+        
+OUTPUT: 
+  policy: 
+    neq:
+      values: 
+       'ACCEPT':
+         severity: RED
+         msg: No firewall set up for output traffic
+    

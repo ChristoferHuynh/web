@@ -1,0 +1,33 @@
+'/dev': 
+  'use%': 
+    ngt: 
+      value: 75
+      severity: BLUE
+      msg: The /dev file system is over 75% capacity.
+
+  mount: 
+    neq: 
+      values:
+        '/dev': 
+         severity: HMM
+         msg: /dev in /dev 4Head Kapp
+         
+'/':
+  'use%':
+    ngr:
+      value: 65
+      severity: BLUE
+      msg: The / filesystem is over 65% capactiy.
+      
+'default':
+  'use%': 
+    ngr: 
+      value: 90
+      severity: YELLOW
+      msg: The filesystem /fs/ is over 90% capacity
+  'filesystem':
+    neq:
+      values:
+        'nfs':
+          severity: YELLOW
+          msg: The filesystem /fs/ is a NFS system.

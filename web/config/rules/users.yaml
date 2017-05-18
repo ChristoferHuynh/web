@@ -1,0 +1,13 @@
+'postgres_user': 
+  'shell':
+    'in':
+      values: 
+        - /bin/false
+        - /usr/sbin/nologin
+      severity: RED
+      msg: postgres should not have access to terminal. switch to /bin/false or /usr/sbin/nologin
+      
+      
+      
+        
+  

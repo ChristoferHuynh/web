@@ -1,0 +1,127 @@
+#key:
+#  value0:
+#   - severity
+#   - message
+#  value1:
+#  # ...
+#
+#k0:
+#  v0:
+#  - s00
+#  - m00
+#  v1:
+#  - s01
+#  - m01
+#  
+#
+#k1: 
+#  v0:
+#  - s10
+#  - m10
+#  v1:
+#  - s11
+#  - m11
+#  
+#PasswordAuthentication:
+#  "no": #no = False, use quotation marks to use 'no' as key
+#  - RED
+#  - PasswordAuthentication are currently set to \"no\". You should set it to \"yes\" to always use a password based authentication.\n\n"
+
+LoginGraceTime:
+  nlt: 
+    value: 60
+    severity: YELLOW
+    msg: LoginGraceTime is less than 60
+  ngr: 
+    value: 120
+    severity: RED
+    msg: LoginGraceTime is greater than 120
+  neq: 
+    values: 
+      '65': 
+        severity: RED
+        msg: The server will have to wait value seconds before disconnecting after a unseccessful login connect request. You should change it to 60 seconds or 120 seconds.
+      '66':
+        severity: YELLOW
+        msg: 66 LoginGrace
+      '250':
+        severity: MEME
+        msg: 600 LoginGrace
+  nbtwn: 
+    values: 
+       'VALUE BETWEEN 1': #MESSAGE FOR BELOW RANGES
+        ranges:
+          - [30, 60]
+          - [2, 5]
+        severity: RED
+        
+       'VALUE BETWEEN 2':
+        ranges:
+          - [65, 68]
+          - [7, 10]
+        severity: YELLOW
+
+
+PermitRootLogin:
+  neq:
+    values:
+      "yes":
+        severity: RED
+        msg: PermitRootLogin is set to "yes" this will allow multiple sysadmins to login to the server as root and the system might not know which sysadmins are logged in as root. You should change PermitRootLogin to "no" so the sysadmins have to login to the system first using their accounts before they can do "-su".
+
+Port:
+  neq:
+    values:
+      "22":
+        severity: YELLOW
+        msg: The default port is set to 22, which the most attackers will check when they are trying to brute force login to the server using several username and password combina-tions. You should consider using another port to login to the server to reduce noise.    
+
+
+ListenAddress:
+  neq:
+    values:
+      "0.0.0.0":
+        severity: RED
+        msg: The entry address is set at 0.0.0.0, this means it will listen to all interfaces, even external one. You should change the address to a internal one so that the server cannot be accessed from the internet unless portforwarded on the system routing.
+StrictModes:
+  neq:
+    values:
+      "no":
+        severity: RED
+        msg: StrictModes are currently set to "no". This means the server doesn't check the users permssion hme directory and rhost before they can login. You should change this to "yes".
+
+RSAAuthentication:
+  neq:
+    values:
+      "no":
+        severity: YELLOW
+        msg: RSAAuthentication are currently set to "no". You should set it to "yes" to be able to use public and private key pairs created by the ssh-keygen1utility for authentication purposes.
+
+PasswordAuthentication:
+  neq:
+    values:
+      "no":
+        severity: YELLOW
+        msg: PasswordAuthentication are currently set to "no". You should set it to "yes" to always use a password based authentication.
+
+AllowAgentForwarding:
+  neq:
+    values:
+      "yes":
+        severity: YELLOW
+        msg: AllowAgentForwarding is currently set to "yes". This should explicity be set to NO, and will disable the option to jump from one system to another, using only.
+           
+X11Forwarding:
+  neq:
+    values:
+      "yes":
+        severity: RED
+        msg: X11Forwarding is currently set to "yes". This should explicitly be set to NO, and will disable a remote X-window or X-shell to be used by an attacker.
+
+AllowTcpForwarding:
+  neq:
+    values:
+      "yes":
+        severity: RED
+        msg: AllowTcpForwarding is currently set to "yes". This should explicitly be set to NO, and will disable the option to jump from one system to another, using only SSH.
+ 

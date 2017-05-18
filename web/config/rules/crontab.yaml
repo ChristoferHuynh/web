@@ -1,0 +1,30 @@
+#'colord':
+#  neq: 
+#    values: 
+#      'no':
+#        severity: YELLOW
+#        msg: A crontab has not been set up for colord, which is expected
+#    
+#'important_job':
+#  neq: 
+#   values: 
+#     'no':
+#        severity: YELLOW
+#        msg: A crontab has not been set up for important_job, which is expected
+
+'blacklist':
+  'root':
+    severity: YELLOW
+    msg: root should probably not run cronjobs.
+  'b_user':
+    severity: RED
+    msg: b_user should not run cronjobs.
+   
+     
+'expected':
+  'colord':
+    severity: YELLOW
+    msg: A crontab has not been set up for colord, which is expected.
+  'e_user':
+    severity: YELLOW
+    msg: User e_user is expected to run cronjobs.

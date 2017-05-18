@@ -1,0 +1,30 @@
+# -rw-r--r-- 1 jesper jesper  244 maj  6 20:02 acceptable_env.txt
+
+'/etc/cron.allow':
+  neq: 
+    values: 
+      'No such file or directory':
+        severity: YELLOW
+        msg: No /etc/cron.allow set up.
+
+  permissions:
+    other:
+      w: 
+        severity: RED
+        msg: Any user can edit /etc/cron.allow.
+        
+
+'/etc/at.allow':
+  neq: 
+    values: 
+      'No such file or directory':
+        severity: YELLOW
+        msg: No /etc/at.allow set up.
+      
+  permissions:
+    other:
+      w: #in code: checks if w is in the last three permissions [rwx]
+        severity: RED
+        msg: Any user can edit /etc/at.allow.
+        
+        

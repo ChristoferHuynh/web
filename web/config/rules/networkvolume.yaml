@@ -1,0 +1,9 @@
+duplicates: "The UUID /uuid/ is shared between the filesystems: /key_set/. Because of the low chance of UUID duplication in proper generation it is possible this has been altered maliciously."
+
+username_password: username/password option found.
+
+backup: No backup found!
+
+pass_root: root device should have pass = 1
+
+pass_non_root: non root device should has pass = 0 or 2

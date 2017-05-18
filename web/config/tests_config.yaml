@@ -1,0 +1,49 @@
+RJParser:
+    cron_at:
+        path: /result/cron_at_info/
+    crontab:
+        path: /result/crontab_info/
+    diskvolume:
+        path: /result/diskvolume_info/
+    #encrypted_disk:
+        #path: /result/encrypted_disk_info/
+    environment:
+        path: /result/environment_info/
+    firewall:
+        path: /result/firewall_info/
+    groups:
+        path: /result/groups_info/
+    lastlog:
+        path: /result/lastlog_info/
+    #modeprobe:
+        #path: /result/modprobe_info/
+    networkvolume:
+        path: /result/networkvolume_info/
+    open_connections:
+        path: /result/open_connections_info/
+    passwdpolicy:
+        path: /result/passwdpolicy_info/
+    processes:
+        path: /result/processes_info/
+    #samba:
+        #path: /result/samba_info/
+    sshd:
+        path: /result/sshd_info/
+    startup:
+        path: /result/startup_info/
+    sudoers:
+        path: /result/sudoers_info/
+    suid_files:
+        path: /result/suid_files_info/
+    system:
+        path: /result/system_info/
+    users:
+        path: /result/users_info/
+
+LynisParser:
+    lynis:
+        path: /
+
+UnixParser:
+    unix:
+        path: /

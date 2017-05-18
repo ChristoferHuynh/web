@@ -1,0 +1,48 @@
+here issues:
+
+### lynis ###
+
+The Lynis audit has found the following warnings: 
+
+Couldn't find 2 responsive nameservers
+
+
+The Lynis audit has found the following suggestions: 
+
+Version of Lynis outdated, consider upgrading to the latest version
+Set a password on GRUB bootloader to prevent altering boot configuration (e.g. boot in single user mode without password)
+Run pwck manually and correct any errors in the password file
+Install a PAM module for password strength testing like pam_cracklib or pam_passwdqc
+Configure minimum password age in /etc/login.defs
+Configure maximum password age in /etc/login.defs
+Default umask in /etc/login.defs could be more strict like 027
+To decrease the impact of a full /home file system, place /home on a separated partition
+To decrease the impact of a full /tmp file system, place /tmp on a separated partition
+To decrease the impact of a full /var file system, place /var on a separated partition
+Disable drivers like USB storage when not used, to prevent unauthorized storage or data theft
+Check DNS configuration for the dns domain name
+Purge old/removed packages (10 found) with aptitude purge or dpkg --purge command. This will cleanup old configuration files, cron jobs and startup scripts.
+Install debsums utility for the verification of packages with known good database.
+Install package apt-show-versions for patch management purposes
+Install a package audit tool to determine vulnerable packages
+Check your resolv.conf file and fill in a backup nameserver if possible
+Consider running ARP monitoring software (arpwatch,arpon)
+Access to CUPS configuration could be more strict.
+Check what deleted files are still in use and why.
+Add a legal banner to /etc/issue, to warn unauthorized users
+Add legal banner to /etc/issue.net, to warn unauthorized users
+Enable process accounting
+Enable sysstat to collect accounting (no results)
+Enable auditd to collect audit information
+Check output of aa-status
+Install a file integrity tool to monitor changes to critical and sensitive files
+Determine if automation tools are present for system management
+One or more sysctl values differ from the scan profile and could be tweaked
+Harden compilers like restricting access to root user only
+Harden the system by installing at least one malware scanner, to perform periodic file system scans
+
+##################
+
+
+
+

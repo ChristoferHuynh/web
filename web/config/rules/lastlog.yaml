@@ -1,0 +1,21 @@
+#'last': 
+#  'root':
+#    neq: 
+#      values: 
+#        'yes': 
+#          severity: YELLOW
+#          msg: root shouldn't log in via anything other than console.
+          
+
+'last':
+  'root':
+    severity: YELLOW
+    msg: root shouldn't log in via anything other than console. (last)
+    
+'lastlog': 
+  'root': 
+    eq:
+      '**Never logged in**':
+        severity: YELLOW
+        msg: root shouldn't log in via anything other than console. (lastlog)
+          

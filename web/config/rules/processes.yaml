@@ -1,0 +1,46 @@
+'/sbin/init splash':
+  'USER':
+    eq:
+      'root':
+        severity: RED
+        msg: The process '/sbin/init splash' is run by another user than root. Security risk
+      
+'default':
+  '%CPU': 
+    ngr: 
+      value: 85
+      severity: YELLOW
+      msg: The process /process/ is using over 85% of the CPU
+  '%MEM':
+    ngr: 
+      value: 85
+      severity: YELLOW
+      msg: The process /process/ is using over 85% of the MEM
+
+'important_processes':
+  '[watchdog/1]':
+    severity: RED
+    message: "[watchdog/1] is missing. It is very important."
+  '[migration/1]': 
+    severity: YELLOW
+    message: "[migration/1] is missing, it is considered important"
+  '[migration/impotest]':
+    severity: RED
+    message: "[migration/impotest] is missing, it's important."
+  'default':  
+    process:  
+      - "[kworker/2:0H]"
+      - "[crypto]"
+      - "[imp-process]"
+      - "[imp-process/2]"
+
+    severity: YELLOW
+    message: /process/ is missing.
+    
+'blacklisted_processes':
+  'default': 
+    process: 
+      - "[watchdogd]"
+      - "[kdevtmpfs]"
+    severity: YELLOW
+    message: /process/ is blacklisted! Consider removing!
