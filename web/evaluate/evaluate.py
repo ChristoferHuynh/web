@@ -43,7 +43,7 @@ def evaluate(parser):
         - evaluation by the input parser
 
     """
-    evaluation = "here issues:\n\n"
+    evaluation = ""
     web_folder = os.getcwd()
     log_folder_path = web_folder + '/logs'
     yaml_config_folder_path = web_folder + '/config'
