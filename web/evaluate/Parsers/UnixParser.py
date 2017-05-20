@@ -37,13 +37,10 @@ class unix(AuditModule):
         
         return_string = ""
         
-        
         if info_dict.has_key("warnings"):
             return_string += "The unix audit has found the following warnings:\n\n"
             
             for warning in info_dict["warnings"]:
-                
                 return_string += warning + "\n"
-        
         
         return return_string

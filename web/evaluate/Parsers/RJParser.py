@@ -896,14 +896,16 @@ class processes(AuditModule):
         # other keys
         
         for key in yaml_dict:
-            for column in yaml_dict[key]:
-                for comparison in yaml_dict[key][column]:
-                    customer_value = info_copy[key][column]
-                    values = yaml_dict[key][column][comparison]
-                    message = compare(customer_value, values, comparison)
-                    
-                    if message is not None:
-                        return_string += message
+            if info_copy.has_key(key):
+                for column in yaml_dict[key]:
+                    for comparison in yaml_dict[key][column]:
+                        if info_copy[key].has_key(column):
+                            customer_value = info_copy[key][column]
+                            values = yaml_dict[key][column][comparison]
+                            message = compare(customer_value, values, comparison)
+                            
+                            if message is not None:
+                                return_string += message
 #        processes_file = open("processes", "r")
 #   
 #         next_line = processes_file.readline() #Skip first line

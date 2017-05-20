@@ -85,8 +85,6 @@ class lynis(AuditModule):
     @staticmethod
     def evaluate(info_dict, yaml_path):
         
-
-        print info_dict
         return_string = ""
         
         if info_dict.has_key("warnings"):
