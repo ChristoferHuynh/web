@@ -571,7 +571,7 @@ class networkvolume(AuditModule):
         
         next_line = file.readline()
         
-        while next_line and "#" not in next_line:
+        while next_line and "#" not in next_line and not next_line.isempty():
             innerValues = next_line.split()
             mount_dict[innerValues[2]] = innerValues
             next_line = file.readline()
