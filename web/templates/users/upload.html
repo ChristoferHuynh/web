@@ -2,12 +2,9 @@
 {% extends "layout.html" %}
 {% block content %}
     <h1 class="h1-upload">Upload log files</h1>
-
-
 <form action="{{ url_for('user.upload_get') }}" method="post" enctype="multipart/form-data">
-         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-
-    Select image to upload:
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    Select logs to upload:
     <input type="file" name="file" id="fileToUpload"> <br>
     <select name="parsers" multiple>
       <option value="RJParser">Remote Job</option>
@@ -15,12 +12,9 @@
       <option value="UnixParser">Unix</option>
     </select>
     <input type="submit" value="Upload File" name="submit">
-
 </form>
-
 <hr>
-
-<h3>List of files available on the storage:</h3>
+<h3>List of logs available on the storage:</h3>
 
 <table>
     <thead>
@@ -38,7 +32,6 @@
     </tbody>
 
 </table>
-
 {% endblock %}
 
 {% block css %}
