@@ -9,41 +9,41 @@ class AuditModule():
     def read(file):
         pass
     @staticmethod
-    def evaluate(info, yaml_path):
+    def evaluate(info_dict, yaml_path):
         pass
 
 class unix(AuditModule):
     
     @staticmethod
     def read(file):
-        values = dict()
+        info_dict = dict()
         
         next_line = file.readline()
         
         while next_line:
             if "WARNING:" in next_line:
                 warning = next_line.replace("WARNING: ", "")[:-1]
-                if values.has_key("warnings"):
-                    values["warnings"].append(warning)
+                if info_dict.has_key("warnings"):
+                    info_dict["warnings"].append(warning)
                 else:
-                    values["warnings"] = [warning]
+                    info_dict["warnings"] = [warning]
         
             next_line = file.readline()
-        return values
+        return info_dict
 
 
     @staticmethod
-    def evaluate(info, yaml_path):
+    def evaluate(info_dict, yaml_path):
         
-        returnString = ""
+        return_string = ""
         
         
-        if info.has_key("warnings"):
-            returnString += "The unix audit has found the following warnings:\n\n"
+        if info_dict.has_key("warnings"):
+            return_string += "The unix audit has found the following warnings:\n\n"
             
-            for warning in info["warnings"]:
+            for warning in info_dict["warnings"]:
                 
-                returnString += warning + "\n"
+                return_string += warning + "\n"
         
         
-        return returnString
+        return return_string

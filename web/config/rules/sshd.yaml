@@ -1,32 +1,3 @@
-#key:
-#  value0:
-#   - severity
-#   - message
-#  value1:
-#  # ...
-#
-#k0:
-#  v0:
-#  - s00
-#  - m00
-#  v1:
-#  - s01
-#  - m01
-#  
-#
-#k1: 
-#  v0:
-#  - s10
-#  - m10
-#  v1:
-#  - s11
-#  - m11
-#  
-#PasswordAuthentication:
-#  "no": #no = False, use quotation marks to use 'no' as key
-#  - RED
-#  - PasswordAuthentication are currently set to \"no\". You should set it to \"yes\" to always use a password based authentication.\n\n"
-
 LoginGraceTime:
   nlt: 
     value: 60
@@ -36,30 +7,6 @@ LoginGraceTime:
     value: 120
     severity: RED
     msg: LoginGraceTime is greater than 120
-  neq: 
-    values: 
-      '65': 
-        severity: RED
-        msg: The server will have to wait value seconds before disconnecting after a unseccessful login connect request. You should change it to 60 seconds or 120 seconds.
-      '66':
-        severity: YELLOW
-        msg: 66 LoginGrace
-      '250':
-        severity: MEME
-        msg: 600 LoginGrace
-  nbtwn: 
-    values: 
-       'VALUE BETWEEN 1': #MESSAGE FOR BELOW RANGES
-        ranges:
-          - [30, 60]
-          - [2, 5]
-        severity: RED
-        
-       'VALUE BETWEEN 2':
-        ranges:
-          - [65, 68]
-          - [7, 10]
-        severity: YELLOW
 
 
 PermitRootLogin:
@@ -76,6 +23,19 @@ Port:
         severity: YELLOW
         msg: The default port is set to 22, which the most attackers will check when they are trying to brute force login to the server using several username and password combina-tions. You should consider using another port to login to the server to reduce noise.    
 
+  nbtwn: 
+      values: 
+         'Do not use the ports 30-60 or 2-5 for ssh': #MESSAGE FOR BELOW RANGES
+          ranges:
+            - [30, 60]
+            - [2, 5]
+          severity: RED
+          
+         'Do not use the ports 65-68 or 7-10 for ssh':
+          ranges:
+            - [65, 68]
+            - [7, 10]
+          severity: YELLOW
 
 ListenAddress:
   neq:

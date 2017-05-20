@@ -21,50 +21,44 @@ class AuditModule():
 class cron_at(AuditModule):   
     @staticmethod
     def read(file):
-        values = dict()
-        files = ["null", "/etc/cron.allow", "/etc/at.allow"]
-        fileIndex = 0
+        info_dict = dict()
       
         next_line = file.readline()
         
         while next_line:
             
             inner_values = next_line.split()
-
             
             if "No such file or directory" in next_line:
-                values[inner_values[3][1:-2]] = ["No such file or directory"] #[1:-2] is to trim the filename from ' and ':
-            
-            elif "total" in next_line:
-                fileIndex = fileIndex + 1
+                info_dict[inner_values[3][1:-2]] = ["No such file or directory"]  # [1:-2] is to trim the filename from from quotation marks
             
             else: 
-                #[permissions][?][owner][group][size][month][day][hour:min][filename]
-                    values[inner_values[8]] = inner_values
+                # [permissions][?][owner][group][size][month][day][hour:min][filename]
+                    info_dict[inner_values[8]] = inner_values[0]
                 
             next_line = file.readline()
                 
-        return values
+        return info_dict
 
     @staticmethod
-    def evaluate(info, yaml_path):
-        returnString = ""
+    def evaluate(info_dict, yaml_path):
+        return_string = ""
         
         
         with open(yaml_path, "r") as stream:
-            data_loaded = yaml.load(stream)
+            yaml_dict = yaml.load(stream)
             
     
-        for key in data_loaded:
-            if info.has_key(key):
-                customer_value = info[key][0]
+        for file_name in yaml_dict:
+            if info_dict.has_key(file_name):
+                info_value = info_dict[file_name]
 
-                for comparison in data_loaded[key]:
-                    values = data_loaded[key][comparison]         
-                    message = compare(customer_value, values, comparison)
-                    if message is not None: returnString += message + "\n"
+                for comparison in yaml_dict[file_name]:
+                    yaml_values = yaml_dict[file_name][comparison]         
+                    message = compare(info_value, yaml_values, comparison)
+                    if message is not None: return_string += message + "\n"
 
-        return returnString
+        return return_string
 
 class crontab(AuditModule):
     @staticmethod
@@ -82,55 +76,55 @@ class crontab(AuditModule):
 
     @staticmethod
     def evaluate(info, yaml_path):
-        returnString = ""
+        return_string = ""
 
         with open(yaml_path, "r") as stream:
-            data_loaded = yaml.load(stream)
+            yaml_dict = yaml.load(stream)
         
         
-        blacklist = data_loaded.pop("blacklist")
-        expected = data_loaded.pop("expected")
+        blacklist = yaml_dict.pop("blacklist")
+        expected = yaml_dict.pop("expected")
         
         for cronjob in blacklist:
             if info.has_key(cronjob):
                 message = blacklist[cronjob]["msg"]
-                returnString += message + "\n"
+                return_string += message + "\n"
                 
         for cronjob in expected:
             if not info.has_key(cronjob):
                 message = expected[cronjob]["msg"]
-                returnString += message + "\n"
+                return_string += message + "\n"
                 
-#         for key in data_loaded:
+#         for key in yaml_dict:
 #             if info.has_key(key):
 #                 customer_value = info[key]
 #                 
-#                 for comparison in data_loaded[key]:
-#                     values = data_loaded[key][comparison]
+#                 for comparison in yaml_dict[key]:
+#                     values = yaml_dict[key][comparison]
 #                     print customer_value
 #                     print values
 #                     print comparison
 #                     message = compare(customer_value, values, comparison)
-#                     if message is not None: returnString += message + "\n"
+#                     if message is not None: return_string += message + "\n"
 
         
-        return returnString
+        return return_string
 
 class diskvolume(AuditModule):
     @staticmethod
     def read(file):
         values = dict()
-        file.readline() #Skip first line
+        file.readline()  # Skip first line
         next_line = file.readline()
         column = ["filesystem", "size", "used", "avail", "use%", "mount"]
         while next_line:
             inner_dict = dict()
-            #[Filesystem][Size][Used][Avail][Use%][Mounted on]
+            # [Filesystem][Size][Used][Avail][Use%][Mounted on]
             inner_values = next_line.split()
             for index in range(0, 6):
                 inner_dict[column[index]] = inner_values[index]
 
-            inner_dict["use%"] = inner_dict["use%"][:-1]        # Removes the % sign
+            inner_dict["use%"] = inner_dict["use%"][:-1]  # Removes the % sign
             values[inner_values[5]] = inner_dict
             next_line = file.readline()
 
@@ -138,7 +132,7 @@ class diskvolume(AuditModule):
 
     @staticmethod
     def evaluate(info, yaml_path):
-        returnString = ""
+        return_string = ""
         info_copy = dict(info)
 
 
@@ -153,7 +147,7 @@ class diskvolume(AuditModule):
                     for comparison in loaded_data[key][column]:
                         values = loaded_data[key][column][comparison]
                         message = compare(customer_value, values, comparison)
-                        if message is not None: returnString += message + "\n"
+                        if message is not None: return_string += message + "\n"
                         
                 info_copy.pop(key)
                 
@@ -167,10 +161,10 @@ class diskvolume(AuditModule):
                     message = compare(customer_value, values, comparison)
                     if message is not None: 
                         message = message.replace("/fs/", key)
-                        returnString += message + "\n"
+                        return_string += message + "\n"
 
         
-        return returnString
+        return return_string
 
 class encrypted_disk(AuditModule):
     @staticmethod
@@ -197,7 +191,7 @@ class encrypted_disk(AuditModule):
 
     @staticmethod
     def evaluate(info, yaml_path):
-        returnString = ""
+        return_string = ""
         uuid_dict = {}
         
         for key in info:
@@ -218,9 +212,9 @@ class encrypted_disk(AuditModule):
                 duplicate_warning_msg = duplicate_warning_msg.replace("/uuid/", uuid)
                 duplicate_warning_msg = duplicate_warning_msg.replace("/key_set/", str(set(uuid_dict[uuid])))
 
-                returnString += duplicate_warning_msg + "\n"
+                return_string += duplicate_warning_msg + "\n"
                 
-        return returnString
+        return return_string
 
 class environment(AuditModule):
     @staticmethod
@@ -232,7 +226,7 @@ class environment(AuditModule):
                 break
             
             innerValues = nextLine.split("=")
-            if (innerValues[0] == "LS_COLORS"): #Hard to parse and don't think it has anythign to do with security risks
+            if (innerValues[0] == "LS_COLORS"):  # Hard to parse and don't think it has anythign to do with security risks
                 continue
             
             values[innerValues[0]] = innerValues[1][:-1]
@@ -240,25 +234,25 @@ class environment(AuditModule):
 
     @staticmethod
     def evaluate(info, yaml_path):
-        returnString = ""
+        return_string = ""
 
         
         with open(yaml_path, "r") as stream:
-            data_loaded = yaml.load(stream)
+            yaml_dict = yaml.load(stream)
 
-        for key in data_loaded:
-            #check if key exists in customer file
+        for key in yaml_dict:
+            # check if key exists in customer file
             if info.has_key(key):
                 customer_value = info[key]
-                values = data_loaded[key]
+                values = yaml_dict[key]
                 for comparison in values:
                     message = compare(customer_value, values[comparison], comparison)
-                    if message is not None: returnString += message + "\n"
+                    if message is not None: return_string += message + "\n"
                 
                 
                 
 
-        return returnString
+        return return_string
 
 class firewall(AuditModule):
     
@@ -284,35 +278,32 @@ class firewall(AuditModule):
 
     @staticmethod
     def evaluate(info, yaml_path):
-        returnString = ""
+        return_string = ""
         
         with open(yaml_path, "r") as stream:
-            data_loaded = yaml.load(stream)
+            yaml_dict = yaml.load(stream)
             
         
         
-        for trafic in data_loaded:
-            columns = data_loaded[trafic]
-            if data_loaded[trafic].has_key("policy"):
-                for comparison in data_loaded[trafic]["policy"]:
+        for trafic in yaml_dict:
+            columns = yaml_dict[trafic]
+            if yaml_dict[trafic].has_key("policy"):
+                for comparison in yaml_dict[trafic]["policy"]:
                     customer_value = info[trafic]
-                    values = data_loaded[trafic]["policy"][comparison]
+                    values = yaml_dict[trafic]["policy"][comparison]
                     
                     
                     message = compare(customer_value, values, comparison)
-                    if message is not None: returnString += message + "\n"
+                    if message is not None: return_string += message + "\n"
 
-        return returnString
+        return return_string
 
 class groups(AuditModule):
     @staticmethod        
     def read(file):
-        
-        values = dict()
+        info_dict = dict()
         
         next_line = file.readline()[:-1]
-        
-        
         
         while next_line:
             inner_dict = dict()
@@ -322,47 +313,49 @@ class groups(AuditModule):
             inner_dict["id"] = inner_values[2]
             inner_dict["users"] = inner_values[3]
 
-            values[inner_dict["group"]] = inner_dict
+            info_dict[inner_dict["group"]] = inner_dict
             next_line = file.readline()[:-1]
 
             
-        return values
+        return info_dict
             
     @staticmethod        
-    def evaluate(info, yaml_path):
-        returnString = ""
+    def evaluate(info_dict, yaml_path):
+        return_string = ""
         
         with open(yaml_path, "r") as stream:
-            data_loaded = yaml.load(stream)
+            yaml_dict = yaml.load(stream)
             
-        defaults = data_loaded.pop("default")
+        default_dict = yaml_dict.pop("default")
         
-        for key, value in data_loaded.iteritems():
-            if info.has_key(key):
-                for column in data_loaded[key]:
-                  customer_value = info[key][column]
-                  for comparison in value[column]:
-                      values = value[column][comparison]
-                      message = compare(customer_value, values, comparison)
-            
-            
+        for key in yaml_dict:
+            if info_dict.has_key(key):
+                for column in yaml_dict[key]:
+                    info_value = info_dict[key][column]
+                    for comparison in yaml_dict[key][column]:
+                        yaml_values = yaml_dict[key][column][comparison]
+                        message = compare(info_value, yaml_values, comparison)
+                        if message is not None: 
+                            message = message.replace("/users/", info_dict[key]["users"])
+                            message = message.replace("/group/", info_dict[key]["group"])
+                            return_string += message + "\n"
+                            
+        for key in info_dict:
+            for column in default_dict:
+                info_value = info_dict[key][column]
+                for comparison in default_dict[column]:
+                    yaml_values = default_dict[column][comparison]
+                    message = compare(info_value, yaml_values, comparison)
+                    if message is not None:
+                        message = message.replace("/users/", info_dict[key]["users"])
+                        message = message.replace("/group/", info_dict[key]["group"])
+                        return_string += message + "\n"            
         
-        #different, simpler but not as comprehensive solution without using YAML
-#         for key in dict:
-#             if dict[key][1] == "!":
-#                 #Unencrypted
-#                 returnString += "The group " + dict[key] + "'s password is unencrypted and stored in /etc/security/passwd."
-#                 
-#             elif dict[key][1] == "*":
-#                 #Invalid
-#                 returnString += "The group " + dict[key] + "'s password is invalid."
-                
-        
-        return returnString
+        return return_string
 
 class lastlog(AuditModule):
     
-    #Unsure how to parse...
+    # Unsure how to parse...
     @staticmethod
     def read(file):
         value = dict()
@@ -378,7 +371,7 @@ class lastlog(AuditModule):
                 last_dict[next_values[0]] = "yes"
             next_line = file.readline()
             
-        next_line = file.readline() #Skip line    
+        next_line = file.readline()  # Skip line    
         while next_line:
             next_values = next_line[:-1].split(None, 1)
             
@@ -396,14 +389,14 @@ class lastlog(AuditModule):
         return value
     @staticmethod
     def evaluate(info, yaml_path):
-        #Not sure how to evaluate...
-        returnString = ""
+        # Not sure how to evaluate...
+        return_string = ""
         
         with open(yaml_path, "r") as stream:
-            data_loaded = yaml.load(stream)
+            yaml_dict = yaml.load(stream)
             
-        last = data_loaded.pop("last")
-        lastlog = data_loaded.pop("lastlog")
+        last = yaml_dict.pop("last")
+        lastlog = yaml_dict.pop("lastlog")
         info_last = info.pop("last")
         info_lastlog = info.pop("lastlog")
         
@@ -415,16 +408,16 @@ class lastlog(AuditModule):
                     message = compare(customer_value, values, comparison)
                     
                     if message is not None:
-                        returnString += message + "\n"
+                        return_string += message + "\n"
                 
         for key in last:
             if info_last.has_key(key):
                 message = last[key]["msg"]
                 
                 if message is not None:
-                    returnString += message + "\n"        
+                    return_string += message + "\n"        
                         
-        return returnString
+        return return_string
 
 class modprobe(AuditModule):    
     @staticmethod
@@ -450,73 +443,73 @@ class modprobe(AuditModule):
     @staticmethod
     def evaluate(info, yaml_path):
         
-        returnString = ""
+        return_string = ""
         
         with open(yaml_path, "r") as stream:
-            data_loaded = yaml.load(stream)
+            yaml_dict = yaml.load(stream)
         
         
         
-        #Important configs
+        # Important configs
         
-        for config in data_loaded["important_configs"]:
+        for config in yaml_dict["important_configs"]:
             if config == "default":
-                important_configs = data_loaded["important_configs"]["default"]["config"]
+                important_configs = yaml_dict["important_configs"]["default"]["config"]
                 for i_config in important_configs:
                     if i_config not in dict["modprobe.d"]:
-                        message = data_loaded["important_configs"]["default"]["message"]
+                        message = yaml_dict["important_configs"]["default"]["message"]
                         message = message.replace("/conf/", i_config)
-                        returnString += message + "\n"
+                        return_string += message + "\n"
             elif config not in dict["modprobe.d"]:
-                message = data_loaded["important_configs"][config]["message"]
-                returnString += message + "\n"
+                message = yaml_dict["important_configs"][config]["message"]
+                return_string += message + "\n"
 
 
-        #Important modules
+        # Important modules
         
-        for module in data_loaded["important_modules"]:
+        for module in yaml_dict["important_modules"]:
             if module == "default":
-                important_modules = data_loaded["important_modules"]["default"]["module"]
+                important_modules = yaml_dict["important_modules"]["default"]["module"]
                 for i_module in important_modules:
                     if i_module not in dict.keys():
-                        message = data_loaded["important_modules"]["default"]["message"]
+                        message = yaml_dict["important_modules"]["default"]["message"]
                         message = message.replace("/module/", i_module)
-                        returnString += message + "\n"
+                        return_string += message + "\n"
                         
             elif module not in dict.keys():
-                message = data_loaded["important_modules"][module]["message"]
-                returnString += message + "\n"
+                message = yaml_dict["important_modules"][module]["message"]
+                return_string += message + "\n"
                 
         
-        #Blacklisted configs
+        # Blacklisted configs
         
-        for config in data_loaded["blacklisted_configs"]:
+        for config in yaml_dict["blacklisted_configs"]:
             if config == "default":
-                important_configs = data_loaded["blacklisted_configs"]["default"]["config"]
+                important_configs = yaml_dict["blacklisted_configs"]["default"]["config"]
                 for i_config in important_configs:
                     if i_config in dict["modprobe.d"]:
-                        message = data_loaded["blacklisted_configs"]["default"]["message"]
+                        message = yaml_dict["blacklisted_configs"]["default"]["message"]
                         message = message.replace("/conf/", i_config)
-                        returnString += message + "\n"
+                        return_string += message + "\n"
             elif config in dict["modprobe.d"]:
-                message = data_loaded["blacklisted_configs"][config]["message"]
-                returnString += message + "\n" 
+                message = yaml_dict["blacklisted_configs"][config]["message"]
+                return_string += message + "\n" 
                 
                 
-        #Blacklisted modules
+        # Blacklisted modules
         
-        for module in data_loaded["blacklisted_modules"]:
+        for module in yaml_dict["blacklisted_modules"]:
             if module == "default":
-                important_modules = data_loaded["blacklisted_modules"]["default"]["module"]
+                important_modules = yaml_dict["blacklisted_modules"]["default"]["module"]
                 for i_module in important_modules:
                     if i_module in dict.keys():
-                        message = data_loaded["blacklisted_modules"]["default"]["message"]
+                        message = yaml_dict["blacklisted_modules"]["default"]["message"]
                         message = message.replace("/module/", i_module)
-                        returnString += message + "\n"
+                        return_string += message + "\n"
                         
             elif module in dict.keys():
-                message = data_loaded["blacklisted_modules"][module]["message"]
-                returnString += message + "\n"
+                message = yaml_dict["blacklisted_modules"][module]["message"]
+                return_string += message + "\n"
                 
 #         modprobe_file = open("modprobe_folders", "r")
 #         
@@ -556,18 +549,18 @@ class modprobe(AuditModule):
 # 
 #         for config in config_list:
 #             if config not in customer_config_list:
-#                 returnString += "The expected file " + config + " is not in your system.\n"
+#                 return_string += "The expected file " + config + " is not in your system.\n"
 #                 
 #         for module in customer_modules:
 #             if module in blacklist:
-#                 returnString += "The system contains the blacklisted module " + module + "\n"
+#                 return_string += "The system contains the blacklisted module " + module + "\n"
 #         
 #         for module in important_list:
 #             if module not in customer_modules:
-#                 returnString += "The system does not contain the important module " + module + "\n"
+#                 return_string += "The system does not contain the important module " + module + "\n"
 
 
-        return returnString 
+        return return_string 
     
 class networkvolume(AuditModule):
     @staticmethod
@@ -610,7 +603,7 @@ class networkvolume(AuditModule):
         return values
     @staticmethod
     def evaluate(info, yaml_path):
-        returnString = ""
+        return_string = ""
     
         uuid_dict = dict()
         
@@ -619,7 +612,7 @@ class networkvolume(AuditModule):
      
         with open(yaml_path, "r") as stream:
                 warnings = yaml.load(stream)
-        #check duplicates
+        # check duplicates
         for key in info_fstab:
             uuid = info_fstab[key]["file_system"].split("=")[1]
             if uuid_dict.has_key(uuid):
@@ -631,38 +624,38 @@ class networkvolume(AuditModule):
             if len(uuid_dict[key]) > 1:
                 message = warnings["duplicates"]
                 message = message.replace("/uuid/", key).replace("/key_set/", str(uuid_dict[key]))
-                returnString += message + "\n"
+                return_string += message + "\n"
                 
-        ##
+        # #
         
-        #check for username/password and backup, pass 
+        # check for username/password and backup, pass 
         for key in info_fstab:
-            #check for username/password
+            # check for username/password
             options = info_fstab[key]["options"]            
             for option in options:
                 if "password" in option or "username" in option:
                     message = warnings["username_password"]
-                    returnString += message + "\n"
+                    return_string += message + "\n"
         
-            #checks for backup
+            # checks for backup
             backup = info_fstab[key]["dump"]
             if backup != 1:
                 message = warnings["backup"]
-                returnString += message + "\n"
+                return_string += message + "\n"
                 
-            #checks for pass
+            # checks for pass
             pass_flag = info_fstab[key]["pass"]
             if key != "/" and pass_flag == "1":
                 message = warnings["pass_non_root"]
-                returnString += message + "\n"
+                return_string += message + "\n"
                 
             elif key == "/" and pass_flag != "1":
                 message = warnings["pass_root"]
-                returnString += message + "\n"
+                return_string += message + "\n"
                 
         
             
-        return returnString
+        return return_string
 
 class open_connections(AuditModule):
 
@@ -670,7 +663,7 @@ class open_connections(AuditModule):
     def read(file):
         values = dict()
         
-        file.readline() #Skip first line
+        file.readline()  # Skip first line
         next_line = file.readline()
         while (next_line and not "COMMAND" in next_line):
             innerValues = next_line.split()
@@ -679,7 +672,7 @@ class open_connections(AuditModule):
             
         while (next_line):
             innerValues = next_line.split()
-            #Unsure what should be the key..
+            # Unsure what should be the key..
             values[innerValues[0] + "#" + innerValues[3]] = innerValues
             next_line = file.readline()
 
@@ -687,13 +680,13 @@ class open_connections(AuditModule):
 
     @staticmethod
     def evaluate(info, yaml_path):
-        returnString = ""
+        return_string = ""
         """Lists of listen ports, estab ports etc
         
         make sure that the ports are not bad according to open_connections file
         
         """
-        return returnString
+        return return_string
 
 class passwdpolicy(AuditModule):
 
@@ -717,20 +710,20 @@ class passwdpolicy(AuditModule):
     @staticmethod
     def evaluate(info, yaml_path):
         
-        returnString = ""
+        return_string = ""
 
         with open(yaml_path, "r") as stream:
-            data_loaded = yaml.load(stream)
+            yaml_dict = yaml.load(stream)
             
             
-        for key in data_loaded:
+        for key in yaml_dict:
             if info.has_key(key):
-                for comparison in data_loaded[key]:
+                for comparison in yaml_dict[key]:
                     customer_value = info[key]
-                    values = data_loaded[key][comparison]
+                    values = yaml_dict[key][comparison]
                     message = compare(customer_value, values, comparison)
                     if message is not None: 
-                        returnString += message + "\n"
+                        return_string += message + "\n"
         
 #         passwd_file = open("passwdpolicy", "r")
 #         
@@ -760,7 +753,7 @@ class passwdpolicy(AuditModule):
 #             if info.has_key(key[1:]):
 #                 #If key is dangerous
 #                 if (key.startswith("^")):
-#                     returnString += "The key " + key + " is considered dangerous.\n"
+#                     return_string += "The key " + key + " is considered dangerous.\n"
 #                 
 #                 else:
 #                     customer_value = info[key[1:]]
@@ -770,11 +763,11 @@ class passwdpolicy(AuditModule):
 #                     print "values:   " + str(values)
 #                     #If value is dangerous
 #                     if "^" + customer_value in values:
-#                         returnString += "The value " + customer_value + " is considered dangerous. Consider switching to " + str([x for x in values if not x.startswith("^")] + ". prefeably one of " + str([x for x in values if x.startswith("*")])) + "\n"
+#                         return_string += "The value " + customer_value + " is considered dangerous. Consider switching to " + str([x for x in values if not x.startswith("^")] + ". prefeably one of " + str([x for x in values if x.startswith("*")])) + "\n"
 #                     
 #                     #If value is not prefered
 #                     if "<" + customer_value in values:
-#                         returnString += "The value " + customer_value + " is not considered preferable. Consider switching to one of " + str([x for x in values if x.startswith("*")]) + "\n"
+#                         return_string += "The value " + customer_value + " is not considered preferable. Consider switching to one of " + str([x for x in values if x.startswith("*")]) + "\n"
 #                         
 #             #If not found in customer
 #             else:
@@ -784,22 +777,22 @@ class passwdpolicy(AuditModule):
 #                     #Add recomended value?
 #         
 #         if len(important_keys) > 0:  
-#                 returnString += "The following important keys were not found: " + str(important_keys) + "\n"
+#                 return_string += "The following important keys were not found: " + str(important_keys) + "\n"
 #         
         
 
         """if info["ENCRYPT_METHOD"] == "MD5":
-            returnString = (returnString + "Your currently password encrypting method is MD5. " + 
+            return_string = (return_string + "Your currently password encrypting method is MD5. " + 
                             "\nYou should consider changing the encrypting method to SHA256 or SHA516.")
             
             
         if info["PASS_MIN_DAYS"] > '0': 
-            returnString = (returnString + "Warning: You have to wait " + dict["PASS_MIN_DAYS"] + 
+            return_string = (return_string + "Warning: You have to wait " + dict["PASS_MIN_DAYS"] + 
                             " days to change password, this can be a security risk in case of accidental password change.")
 
         """
         
-        return returnString
+        return return_string
 
 class processes(AuditModule):
     @staticmethod    
@@ -808,7 +801,7 @@ class processes(AuditModule):
         values = dict()
         
         next_line = file.readline()
-        next_line = file.readline() # Skip first line
+        next_line = file.readline()  # Skip first line
         
         while (next_line):
             inner_dict = dict()
@@ -852,65 +845,65 @@ class processes(AuditModule):
         return values
 
     @staticmethod
-    def evaluate(info, yaml_path): #change to dict if using commented code?
-        returnString = ""   
+    def evaluate(info, yaml_path):  # change to dict if using commented code?
+        return_string = ""   
         
         info_copy = dict(info)
         
         with open(yaml_path, 'r') as stream:
-            data_loaded = yaml.load(stream)
+            yaml_dict = yaml.load(stream)
             
-        default = data_loaded.pop("default")
-        important_processes = data_loaded.pop("important_processes")
-        blacklisted_processes = data_loaded.pop("blacklisted_processes")
+        default = yaml_dict.pop("default")
+        important_processes = yaml_dict.pop("important_processes")
+        blacklisted_processes = yaml_dict.pop("blacklisted_processes")
         
-        #important processes
+        # important processes
         for key in important_processes:
             if key == "default":
                 for process in important_processes["default"]["process"]:
                     if not info.has_key(process):
                         message = important_processes["default"]["message"]
                         message = message.replace("/process/", process)
-                        returnString += message + "\n"
+                        return_string += message + "\n"
             elif not info_copy.has_key(key):
-                returnString += important_processes[key]["message"] + "\n"
+                return_string += important_processes[key]["message"] + "\n"
         
-        #blacklisted processes
+        # blacklisted processes
         for key in blacklisted_processes:
             if key == "default":
                 for process in blacklisted_processes["default"]["process"]:
                     if info.has_key(process):
                         message = blacklisted_processes["default"]["message"]
                         message = message.replace("/process/", process)
-                        returnString += message + "\n"
+                        return_string += message + "\n"
             elif info_copy.has_key(key):
-                returnString += blacklisted_processes[key]["message"] + "\n"
+                return_string += blacklisted_processes[key]["message"] + "\n"
         
         
-        #default value check (CPU & MEM usage)
-        #print info_copy
+        # default value check (CPU & MEM usage)
+        # print info_copy
         for key in info_copy:
             for column in default:
-                customer_value =  info_copy[key][column]
+                customer_value = info_copy[key][column]
                 for comparison in default[column]:
                     values = default[column][comparison]
                     message = compare(customer_value, values, comparison)
                     if message is not None:
                         message = message.replace("/process/", key)
-                        returnString += message + "\n"
+                        return_string += message + "\n"
         
         
-        #other keys
+        # other keys
         
-        for key in data_loaded:
-            for column in data_loaded[key]:
-                for comparison in data_loaded[key][column]:
+        for key in yaml_dict:
+            for column in yaml_dict[key]:
+                for comparison in yaml_dict[key][column]:
                     customer_value = info_copy[key][column]
-                    values = data_loaded[key][column][comparison]
+                    values = yaml_dict[key][column][comparison]
                     message = compare(customer_value, values, comparison)
                     
                     if message is not None:
-                        returnString += message
+                        return_string += message
 #        processes_file = open("processes", "r")
 #   
 #         next_line = processes_file.readline() #Skip first line
@@ -945,11 +938,11 @@ class processes(AuditModule):
 #             
 #             #if process is blacklist
 #             if customer_process in blacklist:
-#                 returnString += "The process " + customer_process + " currently running on your service is in our blacklist\n"
+#                 return_string += "The process " + customer_process + " currently running on your service is in our blacklist\n"
 #             
 #             #if process is non root
 #             elif customer_process in non_root_blacklist and dict[key][0 != "root"]:
-#                 returnString += "The process " + customer_process + " currently running on your service as a non-root. This is considered a security risk\n"
+#                 return_string += "The process " + customer_process + " currently running on your service as a non-root. This is considered a security risk\n"
 # 
 #             #if expected process is found, it removes it from the exepcted processes list
 #             if customer_process in expected_processes:
@@ -957,9 +950,9 @@ class processes(AuditModule):
 #                 
 #         #if expected_processes is NOT empty
 #         if expected_processes:
-#             returnString += "The following processes were expected but could not be found on your system: " + str(expected_processes) + "\n"
+#             return_string += "The following processes were expected but could not be found on your system: " + str(expected_processes) + "\n"
             
-        return returnString
+        return return_string
 
 class samba(AuditModule):
     @staticmethod
@@ -994,7 +987,7 @@ class samba(AuditModule):
         return values
     @staticmethod
     def evaluate(info, yaml_path):
-        returnString = ""
+        return_string = ""
         
         samba_file = open(yaml_path, "r")
         
@@ -1032,109 +1025,104 @@ class samba(AuditModule):
         for key in samba_dict:
             if key[1:] in info.keys():
                 
-                #if Dangerous key
+                # if Dangerous key
                 if key.startswith("^"):
-                    returnString += "The key " + key + " is considered dangerous.\n"
+                    return_string += "The key " + key + " is considered dangerous.\n"
                     
                 else:
                     customer_value = info[key[1:]][0]
                     customer_level = info[key[1:]][1]
                     samba_values = samba_dict[key][0]
                     samba_levels = samba_dict[key][1]
-                    #if Dangerous level
+                    # if Dangerous level
                     if "^" + customer_level in samba_levels:
-                        returnString += "The level for the key " + key[1:] + " is considered dangerous. Consider changing to one of " + str([x[1:] for x in samba_levels if not x.startswith("^")]) + " preferably one of " + str([x[1:] for x in samba_levels if x.startswith("*")]) + "\n"
+                        return_string += "The level for the key " + key[1:] + " is considered dangerous. Consider changing to one of " + str([x[1:] for x in samba_levels if not x.startswith("^")]) + " preferably one of " + str([x[1:] for x in samba_levels if x.startswith("*")]) + "\n"
                         
-                    #if not preferable level
+                    # if not preferable level
                     elif "<" + customer_level in samba_levels:
                         if len([x for x in samba_levels if x.startswith("*")]) > 0:
-                            returnString += "The level for the environment key " + key[1:] + " is not considered preferable. Consider changing to one of " + str([x[1:] for x in samba_levels if x.startswith("*")]) + "\n" 
+                            return_string += "The level for the environment key " + key[1:] + " is not considered preferable. Consider changing to one of " + str([x[1:] for x in samba_levels if x.startswith("*")]) + "\n" 
                       
-                    #cant find level in samba txt    
+                    # cant find level in samba txt    
                     elif "*" + customer_level not in samba_levels:
-                        returnString += "The level " + customer_value + " for the key " + key[1:] + " was not found in our list of \"predetermined\" levels. \n\tRecommended levels: " + str([x[1:] for x in samba_levels if x.startswith("*")]) + "\n\tOkay levels: " + str([x[1:] for x in samba_levels if x.startswith("<")]) + "\n"
+                        return_string += "The level " + customer_value + " for the key " + key[1:] + " was not found in our list of \"predetermined\" levels. \n\tRecommended levels: " + str([x[1:] for x in samba_levels if x.startswith("*")]) + "\n\tOkay levels: " + str([x[1:] for x in samba_levels if x.startswith("<")]) + "\n"
 
                     
-                    #if Dangerous value
+                    # if Dangerous value
                     if "^" + customer_value in samba_values:
-                        returnString += "The value for the key " + key[1:] + " is considered dangerous. Consider changing to one of " + str([x[1:] for x in samba_values if not x.startswith("^")]) + " preferably one of " + str([x[1:] for x in samba_values if x.startswith("*")]) + "\n"
+                        return_string += "The value for the key " + key[1:] + " is considered dangerous. Consider changing to one of " + str([x[1:] for x in samba_values if not x.startswith("^")]) + " preferably one of " + str([x[1:] for x in samba_values if x.startswith("*")]) + "\n"
 
-                    #if not preferable value
+                    # if not preferable value
                     elif "<" + customer_value in samba_values:
                         if len([x for x in samba_levels if x.startswith("*")]) > 0:
-                            returnString += "The value for the environment key " + key[1:] + " is not considered preferable. Consider changing to one of " + str([x[1:] for x in samba_values if x.startswith("*")]) + "\n" 
+                            return_string += "The value for the environment key " + key[1:] + " is not considered preferable. Consider changing to one of " + str([x[1:] for x in samba_values if x.startswith("*")]) + "\n" 
                          
-                    #cant find value in samba txt
+                    # cant find value in samba txt
                     elif "*" + customer_level not in samba_values:
-                        returnString += "The value " + customer_value + " for the key " + key[1:] + " was not found in our list of \"predetermined\" values. \n\tRecommended values: " + str([x[1:] for x in samba_values if x.startswith("*")]) + "\n\tOkay levels: " + str([x[1:] for x in samba_values if x.startswith("<")]) + "\n"
+                        return_string += "The value " + customer_value + " for the key " + key[1:] + " was not found in our list of \"predetermined\" values. \n\tRecommended values: " + str([x[1:] for x in samba_values if x.startswith("*")]) + "\n\tOkay levels: " + str([x[1:] for x in samba_values if x.startswith("<")]) + "\n"
                   
                 samba_important_keys = [x for x in samba_important_keys if x != key[1:]]
-            #cant find key in samba  
+            # cant find key in samba  
             
         if len(samba_important_keys) > 0:
-            returnString += "The following keys were not found in your system: " + str(samba_important_keys) + ". They are considered important."
+            return_string += "The following keys were not found in your system: " + str(samba_important_keys) + ". They are considered important."
                 
                     
                     
             
         
-        return returnString
+        return return_string
 
 class sshd(AuditModule):
     @staticmethod
     def read(file):
-        values = dict()
+        info_dict = dict()
         
         next_line = file.readline()
         
         while (next_line):
 
             if "No such file or directory" in next_line:
-                values["/etc/ssh/sshd_config"] = "No such file or directory"
+                info_dict["/etc/ssh/sshd_config"] = "No such file or directory"
             
             if "#" in next_line or next_line.isspace(): 
                 next_line = file.readline()
                 continue
 
             next_values = next_line.split()
-  
-                
 
-            values[next_values[0]] = next_values[1]
+            info_dict[next_values[0]] = next_values[1]
             
             next_line = file.readline()
         
-        return values
+        return info_dict
     @staticmethod
-    def evaluate(info, yaml_path):
-        returnString = ""
+    def evaluate(info_dict, yaml_path):
+        return_string = ""
         
         with open(yaml_path, "r") as stream:
-            data_loaded = yaml.load(stream)        
+            yaml_dict = yaml.load(stream)        
             
-        for key in data_loaded:
-            if info.has_key(key):
-                customer_value = info[key]
-                values = data_loaded[key]
+        for key in yaml_dict:
+            if info_dict.has_key(key):
+                info_value = info_dict[key]
+                yaml_values = yaml_dict[key]
                 
-                for comparison in values:    
-                    message = compare(customer_value, values[comparison], comparison)
+                for comparison in yaml_values:  
+                    yaml_value = yaml_values[comparison]
+                    message = compare(info_value, yaml_value, comparison)
+                    if message is not None: 
+                        return_string += message + "\n"
 
-                    if message is not None: returnString += message + "\n"
-
-                
-            
-            
-            
-        return returnString
+        return return_string
 
 class startup(AuditModule):
     @staticmethod
     def read(file):
         values = dict()
         
-        file.readline() #Skip first line (/etc/init.d)
-        file.readline() #Skip second line (total 216) //maybe use?
+        file.readline()  # Skip first line (/etc/init.d)
+        file.readline()  # Skip second line (total 216) //maybe use?
         
         next_line = file.readline()
         
@@ -1148,33 +1136,33 @@ class startup(AuditModule):
 
     @staticmethod
     def evaluate(info, yaml_path):
-        returnString = ""
+        return_string = ""
         
         blacklist = []
-        expected  = []
+        expected = []
         
         with open(yaml_path, "r") as stream:
-            data_loaded = yaml.load(stream)
+            yaml_dict = yaml.load(stream)
             
-        expected = data_loaded.pop("expected")
-        blacklist = data_loaded.pop("blacklisted")
-        permission = data_loaded.pop("permission")
+        expected = yaml_dict.pop("expected")
+        blacklist = yaml_dict.pop("blacklisted")
+        permission = yaml_dict.pop("permission")
         
-        #expected scripts
+        # expected scripts
         for script in expected["scripts"]:
             if script not in info:
                 message = expected["msg"]
                 message = message.replace("/script/", script)
-                returnString += message + "\n"
+                return_string += message + "\n"
                 
-        #blacklisted scripts
+        # blacklisted scripts
         for script in blacklist["scripts"]:
             if script in info:
                 message = blacklist["msg"]
                 message = message.replace("/script/", script)
-                returnString += message + "\n"
+                return_string += message + "\n"
 
-        #check permissions
+        # check permissions
         for key, value in info.iteritems():
             permissions = value[0]
             permissions = list(permissions)
@@ -1182,11 +1170,11 @@ class startup(AuditModule):
             if permissions[5] == "w" or permissions[8] == "w":
                 message = permission["msg"]
                 message = message.replace("/script/", key)
-                returnString += message + "\n"
+                return_string += message + "\n"
 
             
             
-        return returnString
+        return return_string
     
 class sudoers(AuditModule):
     @staticmethod
@@ -1213,7 +1201,7 @@ class sudoers(AuditModule):
                 inner_values = next_line.split()
                 tmp = inner_values[1].split("=")
                 username = tmp[0]
-                values[username] = ['','','',command]
+                values[username] = ['', '', '', command]
                 next_line = file.readline()
                 continue
 
@@ -1248,12 +1236,12 @@ class sudoers(AuditModule):
     @staticmethod
     def evaluate(info, yaml_path):
 
-        returnString = ""
+        return_string = ""
 
         if info.has_key("env_reset") == True:
-            returnString += "env_reset is available. The system will make sure the terminal environment remove any user variables and clear potentially harmful environmental variables from the sudo sessions \n \n"
+            return_string += "env_reset is available. The system will make sure the terminal environment remove any user variables and clear potentially harmful environmental variables from the sudo sessions \n \n"
         else:
-            returnString += "env_reset variable has not been set. You should add it the variable in /etc/sudoers"    
+            return_string += "env_reset variable has not been set. You should add it the variable in /etc/sudoers"    
 
         for key, value in info.iteritems():
             if key == "secure_path":
@@ -1262,18 +1250,18 @@ class sudoers(AuditModule):
                  continue
 
             if (value[0] and value[1] and value[2] and value[3]) == "ALL" and ("root" not in key) and ("%" not in key):
-                 returnString += "User: " + "\"" + key + "\"" + " has super user rights.\n\n"
+                 return_string += "User: " + "\"" + key + "\"" + " has super user rights.\n\n"
                  continue
 
             if (value[0] and value[2] and value[3] == "ALL") and (value[1] == '') and ("root" not in key) and ("%admin" not in key) and ("%sudo" not in key):
-                 returnString += "Members of group: " + "\"" + key + "\"" + " may gain root privileges.\n\n"
+                 return_string += "Members of group: " + "\"" + key + "\"" + " may gain root privileges.\n\n"
                  continue
 
             if (value[0] and value[1] and value[2] and value[3] == "ALL") and ("root" not in key) and ("%admin" not in key) and ("%sudo" not in key):
-                 returnString += "Members of sudo group: " + "\"" + key + "\"" + " can execute any command\n\n"
+                 return_string += "Members of sudo group: " + "\"" + key + "\"" + " can execute any command\n\n"
                  continue
 
-        return returnString
+        return return_string
 
 class suid_files(AuditModule):
     @staticmethod
@@ -1289,8 +1277,8 @@ class suid_files(AuditModule):
         return values
     @staticmethod
     def evaluate(info, yaml_path):
-        returnString = ""
-        return returnString
+        return_string = ""
+        return return_string
 
 class system(AuditModule):
     @staticmethod
@@ -1307,8 +1295,8 @@ class system(AuditModule):
         return values
     @staticmethod
     def evaluate(info, yaml_path):
-        returnString = ""
-        return returnString
+        return_string = ""
+        return return_string
 
 class users(AuditModule):
     @staticmethod
@@ -1337,20 +1325,20 @@ class users(AuditModule):
         return values
     @staticmethod
     def evaluate(info, yaml_path):
-        returnString = ""
+        return_string = ""
         
         with open(yaml_path, 'r') as stream:
-            data_loaded = yaml.load(stream)
+            yaml_dict = yaml.load(stream)
                         
-        for key in data_loaded:
+        for key in yaml_dict:
             if info.has_key(key):
-                for column in data_loaded[key]:
-                    for comparison in data_loaded[key][column]:
-                        values = data_loaded[key][column][comparison]
+                for column in yaml_dict[key]:
+                    for comparison in yaml_dict[key][column]:
+                        values = yaml_dict[key][column][comparison]
                         customer_value = info[key][column]
                         message = compare(customer_value, values, comparison)
                         if message is not None: 
-                            returnString += message
+                            return_string += message
                     
 #         for key in dict:
 #             
@@ -1358,41 +1346,41 @@ class users(AuditModule):
 # 
 #             value = dict[key]
 #             if value[2] == "0" and not key == "root":
-#                 returnString = returnString + "User " + "'" + key + "'" + " has super user rights\n"
+#                 return_string = return_string + "User " + "'" + key + "'" + " has super user rights\n"
 #                 risks[0] = True
 #                 
 #             if value[1] == "!":
-#                 returnString = returnString = "User " + "'" + key + "'" + " is stored in /etc/security/passwd and is not encrypted\n"
+#                 return_string = return_string = "User " + "'" + key + "'" + " is stored in /etc/security/passwd and is not encrypted\n"
 #                 risks[1] = True
 #                 
 #             elif value[1] == "*":
-#                 returnString = returnString + "User " + "'" + key + "'" + " has an invalid password\n"
+#                 return_string = return_string + "User " + "'" + key + "'" + " has an invalid password\n"
 #                 risks[2] = True
 #                 
 #             
 #             if risks[0]:
-#                 returnString += "\nYou should change the users' priviliges"
+#                 return_string += "\nYou should change the users' priviliges"
 #             
 #             if risks[1]:
-#                 returnString += "\nYou should encrypt the users' password"
+#                 return_string += "\nYou should encrypt the users' password"
 #             
 #             if risks[2]:
-#                 returnString += "\nYou should change users' password to a valid one"
+#                 return_string += "\nYou should change users' password to a valid one"
 #                       
-        return returnString
+        return return_string
 
 def compare(customer_value, values, comparison):
     
-    #Equal
+    # Equal
     
     if comparison == "eq":
-        value  = values.keys()[0]
+        value = values.keys()[0]
 
         if customer_value != value:
             message = values[value]["msg"]
             severity = values[value]["severity"]
             return message    
-    #Not equal 
+    # Not equal 
     if comparison == "neq":
         values = values["values"]
 
@@ -1439,21 +1427,21 @@ def compare(customer_value, values, comparison):
                 other_rwx = customer_value[7:]
                 for permission in values[permission_group]:
                     if permission in other_rwx:
-                        message = values[permission_group][permission]["msg"]
+                        message = values[permission_group] [permission]["msg"]
                         return message
                     
             if permission_group == "user":
                 user_rwx = customer_value[1:4]
                 for permission in values[permission_group]:
                     if permission in user_rwx:
-                        message = values[permission_group][permission]["msg"]
+                        message = values[permission_group] [permission]["msg"]
                         return message
             
             if permission_group == "group":
                 group_rwx = customer_value[4:7]
                 for permission in values[permission_group]:
                     if permission in group_rwx:
-                        message = values[permission_group][permission]["msg"]
+                        message = values[permission_group] [permission]["msg"]
                         return message
         
             

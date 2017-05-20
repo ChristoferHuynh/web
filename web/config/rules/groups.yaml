@@ -1,28 +1,27 @@
 'default': 
-  password:
-    neq:
-      values: 
+  'password':
+    'neq':
+      'values': 
         '!':
-          severity: RED
-          msg: The password for /group/ is invalid.
+          'severity': RED
+          'msg': The password for /group/ is invalid.
         '*':
-          severity: RED
-          msg: The password for /group/ is not encrypted and is stored in /etc/security/passwd
+          'severity': RED
+          'msg': The password for /group/ is not encrypted and is stored in /etc/security/passwd
         
 'root':
-  users:
-    eq:
+  'users':
+    'eq':
       '':
-         severity: RED
-         msg: The users /users/ are in the root group.
+         'severity': RED
+         'msg': The users /users/ are in the root group.
   
-  password:
-    neq:
-      values: 
+  'password':
+    'neq':
+      'values': 
         '!':
-          severity: RED
-          msg: The password for root is invalid.
+          'severity': RED
+          'msg': The password for root is invalid.
         '*':
-          severity: RED
-          msg: The password for root is not encrypted and is stored in /etc/security/passwd
-   
+          'severity': RED
+          'msg': The password for root is not encrypted and is stored in /etc/security/passwd
