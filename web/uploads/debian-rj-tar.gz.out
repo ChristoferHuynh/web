@@ -45,9 +45,9 @@ No firewall set up for output traffic
 
 ### startup ###
 
+The startup script bluetooth should be started along the computer
+The startup script avahi-daemon should be started along the computer
 The startup script expected-service should be started along the computer
-The startup script bluetooth should not be started along the system
-The startup script avahi-daemon should not be started along the system
 
 ##################
 
@@ -56,7 +56,8 @@ The startup script avahi-daemon should not be started along the system
 
 ### sshd ###
 
-LoginGraceTime is greater than 120
+PasswordAuthentication are currently set to "no". You should set it to "yes" to always use a password based authentication.
+X11Forwarding is currently set to "yes". This should explicitly be set to NO, and will disable a remote X-window or X-shell to be used by an attacker.
 The default port is set to 22, which the most attackers will check when they are trying to brute force login to the server using several username and password combinations. You should consider using another port to login to the server to reduce noise.
 
 ##################
@@ -67,6 +68,7 @@ The default port is set to 22, which the most attackers will check when they are
 ### crontab ###
 
 root should probably not run cronjobs.
+A crontab has not been set up for colord, which is expected.
 User e_user is expected to run cronjobs.
 
 ##################
@@ -94,10 +96,12 @@ env_reset is available. The system will make sure the terminal environment remov
 
 ### processes ###
 
+[kworker/2:0H] is missing.
 [imp-process] is missing.
 [imp-process/2] is missing.
+[migration/1] is missing, it is considered important
 [migration/impotest] is missing, it's important.
-[watchdogd] is blacklisted! Consider removing!
+[watchdog/1] is missing. It is very important.
 [kdevtmpfs] is blacklisted! Consider removing!
 
 ##################

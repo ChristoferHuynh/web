@@ -21,7 +21,7 @@
     'values':
       '22':
         'severity': YELLOW
-        'msg': The default port is set to 22, which the most attackers will check when they are trying to brute force login to the server using several username and password combina-tions. You should consider using another port to login to the server to reduce noise.    
+        'msg': The default port is set to 22, which the most attackers will check when they are trying to brute force login to the server using several username and password combinations. You should consider using another port to login to the server to reduce noise.    
 
   'nbtwn': 
       'values': 
