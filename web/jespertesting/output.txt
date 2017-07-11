@@ -110,6 +110,25 @@ The password for sys is invalid.
 
 
 
+### modprobe ###
+
+important_config.conf is missing.
+really-important.conf is missing. It is very important.
+important_module is missing, it is considered important
+The module 'v-i-module' is missing, and it is very important.
+blacklist-rare-network.conf is blacklisted! Consider removing!
+intel-microcode-blacklist.conf is blacklisted! Consider removing!
+iwlwifi.conf is blacklisted! Consider removing!
+mlx4.conf is blacklisted! Consider removing!
+vmwgfx-fbdev.conf is blacklisted! Consider removing!
+joydev is blacklisted! Consider removing!
+videobuf2_vmalloc is blacklisted! Consider removing!
+
+##################
+
+
+
+
 ### processes ###
 
 [imp-process] is missing.
@@ -120,6 +139,14 @@ The password for sys is invalid.
 The process [ksoftirqd/0] is using over 85% of the MEM
 The process [kthreadd] is using over 85% of the CPU
 The process '/sbin/init splash' is run by another user than root. Security risk
+##################
+
+
+
+
+### samba ###
+
+None
 ##################
 
 
@@ -170,6 +197,16 @@ No backup found!
 ### passwdpolicy ###
 
 The max number of days before having to change a password is more than 90 days. It is recommended to have it at 90.
+
+##################
+
+
+
+
+### encrypted_disk ###
+
+The UUID "0f358511-bb28-4967-9b20-bad5f0932352" is shared between the filesystems: set(['/dev/sda5:', '/dev/sda1:']). Because of the low chance of UUID duplication in proper generation it is possible this has been altered maliciously."
+The UUID "51d1496b-02" is shared between the filesystems: set(['/dev/sda1:', '/dev/sda2:']). Because of the low chance of UUID duplication in proper generation it is possible this has been altered maliciously."
 
 ##################
 

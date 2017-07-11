@@ -1,0 +1,16 @@
+'key':
+  'in': 
+    'values':
+    - 'level#%value'
+    - 'level#%value'
+    'severity': YELLOW
+    'msg': The key key should be in the field global.
+    
+
+   
+'wins support':
+  'in':
+    'values':
+    - 'home#%yes'
+    'severity': RED
+    'msg': 'The key: /key/ is present in the level: /level/ with the value: /value/. Consider changing to level: global, value:  yes'

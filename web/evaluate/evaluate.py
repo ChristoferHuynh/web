@@ -62,7 +62,6 @@ def evaluate(parser):
 
 
 def main():
-    print "START"
     #from Parsers import RJParser as parser
     from Parsers import RJParser as parser
     

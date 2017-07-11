@@ -203,8 +203,6 @@ class encrypted_disk(AuditModule):
                         uuid_dict[info[key][key_key]] = [key]
                     
         
-        
-        
         for uuid in uuid_dict:
             duplicate_warning_msg = open("duplicate_uuid_warning_msg.txt", "r").read()
             
@@ -456,11 +454,11 @@ class modprobe(AuditModule):
             if config == "default":
                 important_configs = yaml_dict["important_configs"]["default"]["config"]
                 for i_config in important_configs:
-                    if i_config not in dict["modprobe.d"]:
+                    if i_config not in info["modprobe.d"]:
                         message = yaml_dict["important_configs"]["default"]["message"]
                         message = message.replace("/conf/", i_config)
                         return_string += message + "\n"
-            elif config not in dict["modprobe.d"]:
+            elif config not in info["modprobe.d"]:
                 message = yaml_dict["important_configs"][config]["message"]
                 return_string += message + "\n"
 
@@ -471,12 +469,12 @@ class modprobe(AuditModule):
             if module == "default":
                 important_modules = yaml_dict["important_modules"]["default"]["module"]
                 for i_module in important_modules:
-                    if i_module not in dict.keys():
+                    if i_module not in info.keys():
                         message = yaml_dict["important_modules"]["default"]["message"]
                         message = message.replace("/module/", i_module)
                         return_string += message + "\n"
                         
-            elif module not in dict.keys():
+            elif module not in info.keys():
                 message = yaml_dict["important_modules"][module]["message"]
                 return_string += message + "\n"
                 
@@ -487,11 +485,11 @@ class modprobe(AuditModule):
             if config == "default":
                 important_configs = yaml_dict["blacklisted_configs"]["default"]["config"]
                 for i_config in important_configs:
-                    if i_config in dict["modprobe.d"]:
+                    if i_config in info["modprobe.d"]:
                         message = yaml_dict["blacklisted_configs"]["default"]["message"]
                         message = message.replace("/conf/", i_config)
                         return_string += message + "\n"
-            elif config in dict["modprobe.d"]:
+            elif config in info["modprobe.d"]:
                 message = yaml_dict["blacklisted_configs"][config]["message"]
                 return_string += message + "\n" 
                 
@@ -502,12 +500,12 @@ class modprobe(AuditModule):
             if module == "default":
                 important_modules = yaml_dict["blacklisted_modules"]["default"]["module"]
                 for i_module in important_modules:
-                    if i_module in dict.keys():
+                    if i_module in info.keys():
                         message = yaml_dict["blacklisted_modules"]["default"]["message"]
                         message = message.replace("/module/", i_module)
                         return_string += message + "\n"
                         
-            elif module in dict.keys():
+            elif module in info.keys():
                 message = yaml_dict["blacklisted_modules"][module]["message"]
                 return_string += message + "\n"
                 
@@ -571,7 +569,7 @@ class networkvolume(AuditModule):
         
         next_line = file.readline()
         
-        while next_line and "#" not in next_line and not next_line.isempty():
+        while next_line and "#" not in next_line and not next_line.isspace():
             innerValues = next_line.split()
             mount_dict[innerValues[2]] = innerValues
             next_line = file.readline()
@@ -976,104 +974,128 @@ class samba(AuditModule):
                 continue
             
             if "[" in next_line:
-                level = next_line
+                level = next_line[1:-2]
                 next_line = file.readline()
                 continue
             
             next_values = next_line.split(" = ")
+            next_dict = dict()
+            next_dict['value'] = next_values[1][:-1]
+            next_dict['level'] = level
             
-            values[next_values[0].lstrip()] = [next_values[1][:-1], level[:-1]]
+            values[next_values[0].lstrip()] = next_dict
             
             next_line = file.readline()
         
         return values
     @staticmethod
     def evaluate(info, yaml_path):
-        return_string = ""
         
-        samba_file = open(yaml_path, "r")
-        
-        
-        samba_dict = dict()
-        
-        samba_lists = [[]]
-        
-        
-        samba_important_keys = []
-        
-        samba_lists[0] = ([1, 2, 3])
-        samba_lists.append([17, 6, 5])
-        
-        next_line = samba_file.readline()
-        
-        while next_line:
-            if next_line.startswith("%") or next_line.isspace():
-                next_line = samba_file.readline()
-                continue
-            samba_k_v_l = next_line[:-1].split("=")
-            samba_key = samba_k_v_l[0]
-            samba_v_l = samba_k_v_l[1].split(",")
+        with open(yaml_path, 'r') as stream:
+            yaml_dict = yaml.load(stream)
             
-            
-            next_line = samba_file.readline()
-            samba_values = samba_v_l[0].split("|")
-            samba_levels = samba_v_l[1].split("|")
-            
-            if samba_key.startswith("#"): samba_important_keys.append(samba_key[1:])
+        
+        for key in yaml_dict:
+            if info.has_key(key):
+                #pop out value(otherwise going through comparisons might give issue)
+                customer_value = info[key]['value']
+                customer_level = info[key]['level']
+                customer_level_value = customer_level + ("#%") + customer_value
+                for comparison in yaml_dict[key]:
+                    yaml_values = yaml_dict[key][comparison]
+                    msg = compare(customer_level_value, yaml_values, comparison)
+                    if msg is not None:
+                        msg = msg.replace("/key/", key)
+                        msg = msg.replace("/level/", customer_level)
+                        msg = msg.replace("/value/", customer_value)
                 
-            samba_dict[samba_key] = [samba_values, samba_levels]
-            
-            
-        for key in samba_dict:
-            if key[1:] in info.keys():
                 
-                # if Dangerous key
-                if key.startswith("^"):
-                    return_string += "The key " + key + " is considered dangerous.\n"
-                    
-                else:
-                    customer_value = info[key[1:]][0]
-                    customer_level = info[key[1:]][1]
-                    samba_values = samba_dict[key][0]
-                    samba_levels = samba_dict[key][1]
-                    # if Dangerous level
-                    if "^" + customer_level in samba_levels:
-                        return_string += "The level for the key " + key[1:] + " is considered dangerous. Consider changing to one of " + str([x[1:] for x in samba_levels if not x.startswith("^")]) + " preferably one of " + str([x[1:] for x in samba_levels if x.startswith("*")]) + "\n"
-                        
-                    # if not preferable level
-                    elif "<" + customer_level in samba_levels:
-                        if len([x for x in samba_levels if x.startswith("*")]) > 0:
-                            return_string += "The level for the environment key " + key[1:] + " is not considered preferable. Consider changing to one of " + str([x[1:] for x in samba_levels if x.startswith("*")]) + "\n" 
-                      
-                    # cant find level in samba txt    
-                    elif "*" + customer_level not in samba_levels:
-                        return_string += "The level " + customer_value + " for the key " + key[1:] + " was not found in our list of \"predetermined\" levels. \n\tRecommended levels: " + str([x[1:] for x in samba_levels if x.startswith("*")]) + "\n\tOkay levels: " + str([x[1:] for x in samba_levels if x.startswith("<")]) + "\n"
-
-                    
-                    # if Dangerous value
-                    if "^" + customer_value in samba_values:
-                        return_string += "The value for the key " + key[1:] + " is considered dangerous. Consider changing to one of " + str([x[1:] for x in samba_values if not x.startswith("^")]) + " preferably one of " + str([x[1:] for x in samba_values if x.startswith("*")]) + "\n"
-
-                    # if not preferable value
-                    elif "<" + customer_value in samba_values:
-                        if len([x for x in samba_levels if x.startswith("*")]) > 0:
-                            return_string += "The value for the environment key " + key[1:] + " is not considered preferable. Consider changing to one of " + str([x[1:] for x in samba_values if x.startswith("*")]) + "\n" 
-                         
-                    # cant find value in samba txt
-                    elif "*" + customer_level not in samba_values:
-                        return_string += "The value " + customer_value + " for the key " + key[1:] + " was not found in our list of \"predetermined\" values. \n\tRecommended values: " + str([x[1:] for x in samba_values if x.startswith("*")]) + "\n\tOkay levels: " + str([x[1:] for x in samba_values if x.startswith("<")]) + "\n"
-                  
-                samba_important_keys = [x for x in samba_important_keys if x != key[1:]]
-            # cant find key in samba  
-            
-        if len(samba_important_keys) > 0:
-            return_string += "The following keys were not found in your system: " + str(samba_important_keys) + ". They are considered important."
-                
-                    
-                    
-            
-        
-        return return_string
+                 
+#         print "samba/eval"
+#         
+#         print info
+#         return_string = ""
+#         
+#         
+#         samba_file = open(yaml_path, "r")
+#         
+#         samba_dict = dict()
+#         
+#         samba_lists = [[]]
+#         
+#         
+#         samba_important_keys = []
+#         
+#         samba_lists[0] = ([1, 2, 3])
+#         samba_lists.append([17, 6, 5])
+#         
+#         next_line = samba_file.readline()
+#         
+#         while next_line:
+#             if next_line.startswith("%") or next_line.isspace():
+#                 next_line = samba_file.readline()
+#                 continue
+#             samba_k_v_l = next_line[:-1].split("=")
+#             samba_key = samba_k_v_l[0]
+#             samba_v_l = samba_k_v_l[1].split(",")
+#             
+#             
+#             next_line = samba_file.readline()
+#             samba_values = samba_v_l[0].split("|")
+#             samba_levels = samba_v_l[1].split("|")
+#             
+#             if samba_key.startswith("#"): samba_important_keys.append(samba_key[1:])
+#                 
+#             samba_dict[samba_key] = [samba_values, samba_levels]
+#             
+#             
+#         for key in samba_dict:
+#             if key[1:] in info.keys():
+#                 
+#                 # if Dangerous key
+#                 if key.startswith("^"):
+#                     return_string += "The key " + key + " is considered dangerous.\n"
+#                     
+#                 else:
+#                     customer_value = info[key[1:]][0]
+#                     customer_level = info[key[1:]][1]
+#                     samba_values = samba_dict[key][0]
+#                     samba_levels = samba_dict[key][1]
+#                     # if Dangerous level
+#                     if "^" + customer_level in samba_levels:
+#                         return_string += "The level for the key " + key[1:] + " is considered dangerous. Consider changing to one of " + str([x[1:] for x in samba_levels if not x.startswith("^")]) + " preferably one of " + str([x[1:] for x in samba_levels if x.startswith("*")]) + "\n"
+#                         
+#                     # if not preferable level
+#                     elif "<" + customer_level in samba_levels:
+#                         if len([x for x in samba_levels if x.startswith("*")]) > 0:
+#                             return_string += "The level for the environment key " + key[1:] + " is not considered preferable. Consider changing to one of " + str([x[1:] for x in samba_levels if x.startswith("*")]) + "\n" 
+#                       
+#                     # cant find level in samba txt    
+#                     elif "*" + customer_level not in samba_levels:
+#                         return_string += "The level " + customer_value + " for the key " + key[1:] + " was not found in our list of \"predetermined\" levels. \n\tRecommended levels: " + str([x[1:] for x in samba_levels if x.startswith("*")]) + "\n\tOkay levels: " + str([x[1:] for x in samba_levels if x.startswith("<")]) + "\n"
+# 
+#                     
+#                     # if Dangerous value
+#                     if "^" + customer_value in samba_values:
+#                         return_string += "The value for the key " + key[1:] + " is considered dangerous. Consider changing to one of " + str([x[1:] for x in samba_values if not x.startswith("^")]) + " preferably one of " + str([x[1:] for x in samba_values if x.startswith("*")]) + "\n"
+# 
+#                     # if not preferable value
+#                     elif "<" + customer_value in samba_values:
+#                         if len([x for x in samba_levels if x.startswith("*")]) > 0:
+#                             return_string += "The value for the environment key " + key[1:] + " is not considered preferable. Consider changing to one of " + str([x[1:] for x in samba_values if x.startswith("*")]) + "\n" 
+#                          
+#                     # cant find value in samba txt
+#                     elif "*" + customer_level not in samba_values:
+#                         return_string += "The value " + customer_value + " for the key " + key[1:] + " was not found in our list of \"predetermined\" values. \n\tRecommended values: " + str([x[1:] for x in samba_values if x.startswith("*")]) + "\n\tOkay levels: " + str([x[1:] for x in samba_values if x.startswith("<")]) + "\n"
+#                   
+#                 samba_important_keys = [x for x in samba_important_keys if x != key[1:]]
+#             # cant find key in samba  
+#             
+#         if len(samba_important_keys) > 0:
+#             return_string += "The following keys were not found in your system: " + str(samba_important_keys) + ". They are considered important."
+#                 
+#         return return_string
+#     
 
 class sshd(AuditModule):
     @staticmethod
