@@ -4,13 +4,6 @@
       value: 75
       severity: BLUE
       msg: The /dev file system is over 75% capacity.
-
-  mount: 
-    neq: 
-      values:
-        '/dev': 
-         severity: HMM
-         msg: /dev in /dev 4Head Kapp
          
 '/':
   'use%':

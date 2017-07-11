@@ -27,7 +27,8 @@ Then run the following commands to bootstrap your environment ::
     cd web
     sudo pip install -r requirements/dev.txt
     bower install
-    flask run
+    cd web
+    sh run.sh
 
 You will see a pretty welcome screen.
 

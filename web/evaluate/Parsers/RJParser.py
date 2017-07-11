@@ -574,7 +574,7 @@ class networkvolume(AuditModule):
             mount_dict[innerValues[2]] = innerValues
             next_line = file.readline()
 
-        while next_line:
+        while next_line and "#" not in next_line and not next_line.isspace():
             inner_dict = dict()
             if ("#" in next_line): 
                 next_line = file.readline()
